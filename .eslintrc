@@ -1,0 +1,34 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "airbnb",
+    "plugin:react/recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "rules": {
+    "no-console": "off",
+    "require-jsdoc": ["error", {
+      "require": {
+        "FunctionDeclaration": false,
+        "MethodDefinition": false,
+        "ClassDeclaration": false,
+        "ArrowFunctionExpression": false
+      }
+    }],
+    "max-len": ["error", {
+      "code": 80
+    }],
+    "comma-dangle": "off",
+    "arrow-parens": ["error", "as-needed"],
+    "consistent-return": "off"
+  },
+  "env": {
+    "node": true
+  }
+}
