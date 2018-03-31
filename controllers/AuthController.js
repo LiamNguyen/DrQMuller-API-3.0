@@ -1,20 +1,54 @@
-const { CREATED, BAD_REQUEST } = require('http-status-codes');
+const { OK, CREATED, BAD_REQUEST } = require('http-status-codes');
 
 const ApiError = require('../constants/ApiError');
 
-const UserService = require('../services/UserService');
+const AuthService = require('../services/AuthService');
 
-exports.POST = (request, response, next) => {
+exports.POST_CREATE = (request, response, next) => {
   const { username, password } = request.body;
 
-  UserService.createUser(username, password, error => {
-    if (error) {
+  AuthService.createUser(username, password, (clientError, error, loginToken) => {
+    if (clientError || error) {
       response.locals.statusCode = BAD_REQUEST;
-      response.locals.clientError = ApiError.create_user_failed;
+      response.locals.clientError = clientError || ApiError.server_error;
       response.locals.error = error;
       next();
     } else {
-      response.status(CREATED).send();
+      response.status(CREATED).json({ loginToken });
+    }
+  });
+};
+
+exports.POST_SIGNIN = (request, response, next) => {
+  const { username, password } = request.body;
+
+  AuthService.signin(
+    username,
+    password,
+    (clientError, error, authorizationToken) => {
+      if (clientError || error) {
+        response.locals.statusCode = BAD_REQUEST;
+        response.locals.clientError = clientError || ApiError.server_error;
+        response.locals.error = error;
+        next();
+      } else {
+        response.status(OK).json({ authorizationToken });
+      }
+    }
+  );
+};
+
+exports.POST_SIGNOUT = (request, response, next) => {
+  const { authorization } = request.headers;
+
+  AuthService.signout(authorization, (error, removal) => {
+    if (error || !authorization || removal.result.n === 0) {
+      response.locals.statusCode = BAD_REQUEST;
+      response.locals.clientError = ApiError.server_error;
+      response.locals.error = error;
+      next();
+    } else {
+      response.status(OK).send();
     }
   });
 };

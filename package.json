@@ -19,7 +19,8 @@
     "mongoose": "^4.11.13",
     "mongoose-guid": "^1.0.2",
     "node": "^8.3.0",
-    "nodemon": "^1.12.1"
+    "nodemon": "^1.12.1",
+    "uuid": "^3.2.1"
   },
   "author": "Liam Nguyen",
   "license": "ISC",

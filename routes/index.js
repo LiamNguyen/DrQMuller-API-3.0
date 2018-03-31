@@ -1,3 +1,5 @@
+const { BAD_REQUEST } = require('http-status-codes');
+
 const EventLoggerRepository = require('../repositories/EventLoggerRepository');
 const LogTypeConstants = require('../constants/LogTypeConstants');
 const Auth = require('./Auth');
@@ -8,14 +10,17 @@ module.exports = app => {
   // Error handler
   app.use((request, response) => {
     const { statusCode, clientError, error } = response.locals;
-    EventLoggerRepository.create(
-      LogTypeConstants.error,
-      request,
-      error,
-      statusCode
-    );
+
+    if (error) {
+      EventLoggerRepository.create(
+        LogTypeConstants.error,
+        request,
+        error,
+        statusCode
+      );
+    }
     response
-      .status(statusCode)
+      .status(statusCode || BAD_REQUEST)
       .send(clientError);
   });
 };

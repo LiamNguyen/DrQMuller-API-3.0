@@ -1,10 +1,8 @@
 const mongoose = require('mongoose');
-const GUID = require('mongoose-guid');
 
 const eventLoggerSchema = mongoose.Schema({
   id: {
-    type: GUID.type,
-    default: GUID.value
+    type: String
   },
   eventSource: {
     type: String,
