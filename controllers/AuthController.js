@@ -1,4 +1,9 @@
-const { OK, CREATED, BAD_REQUEST } = require('http-status-codes');
+const {
+  OK,
+  CREATED,
+  BAD_REQUEST,
+  UNAUTHORIZED
+} = require('http-status-codes');
 
 const ApiError = require('../constants/ApiError');
 
@@ -42,10 +47,14 @@ exports.POST_SIGNOUT = (request, response, next) => {
   const { authorization } = request.headers;
 
   AuthService.signout(authorization, (error, removal) => {
-    if (error || !authorization || removal.result.n === 0) {
+    if (error || !authorization) {
       response.locals.statusCode = BAD_REQUEST;
       response.locals.clientError = ApiError.server_error;
       response.locals.error = error;
+      next();
+    } else if (removal.result.n === 0) {
+      response.locals.statusCode = UNAUTHORIZED;
+      response.locals.clientError = '';
       next();
     } else {
       response.status(OK).send();

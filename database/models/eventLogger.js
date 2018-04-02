@@ -5,21 +5,21 @@ const eventLoggerSchema = mongoose.Schema({
     type: String
   },
   eventSource: {
-    type: String,
-    required: true
+    type: String
   },
   eventCode: {
-    type: String,
-    required: true
+    type: String
   },
   statusCode: {
-    type: Number,
-    required: true
+    type: Number
   },
   response: {
     type: String
   },
   userAgent: {
+    type: String
+  },
+  error: {
     type: String
   },
   createdAt: {

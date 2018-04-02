@@ -1,5 +1,6 @@
 module.exports = {
   info: 'info',
   exception: 'exception',
-  error: 'error'
+  error: 'error',
+  localError: 'local-error'
 };

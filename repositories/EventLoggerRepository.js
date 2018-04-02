@@ -19,3 +19,9 @@ module.exports.create = (
     userAgent: request.get('User-Agent')
   });
 };
+
+module.exports.createLocalError = (logType, error) => {
+  const id = uuidv1();
+
+  EventLogger.create({ id, error, eventCode: logType });
+};

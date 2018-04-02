@@ -1,0 +1,102 @@
+#%RAML 1.0
+title: DrQMuller v3.0
+baseUri: http://localhost:5000
+version:
+securitySchemes:
+  x-token:
+    description: |
+      A custom security scheme for authenticating requests.
+    type: x-custom
+    describedBy:
+      headers:
+        Authorization:
+          description: |
+            Used to send a custom token.
+          type: string
+          example: bc5990f1-fb92-4715-a831-ee073a4bc3f5
+      responses:
+        200:
+          body:
+            application/json:
+          description: Successful request
+        401:
+          description: |
+            Bad token.
+
+/signin:
+  post:
+    description: User signin
+    body:
+      application/json:
+        example: |
+          {
+            "username": "username1",
+            "password": "password1"
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+             {
+               "authorizationToken": "53292990-3645-11e8-af05-bd47a7e93b38"
+             }
+      400:
+        body:
+          application/json:
+            example: |
+             {
+               "error_message": "Invalid username or password",
+               "error_code": "invalid_username_or_password"
+             }
+
+/signout:
+  securedBy: x-token
+  post:
+    description: User signout
+    responses:
+      200:
+        body:
+          text:
+            type: EmptyString
+      400:
+        body:
+          application/json:
+            example: |
+             {
+               "error_message": "There was a server error",
+               "error_code": "server_error"
+             }
+      401:
+        description: Unauthorized
+        body:
+          application/json:
+             type: Unauthorized
+
+/user:
+  post:
+    description: Create new user
+    body:
+      application/json:
+        example: |
+          {
+            "username": "username1",
+            "password": "password1"
+          }
+    description: Create new user
+    responses:
+      201:
+        body:
+          application/json:
+            example: |
+             {
+               "authorizationToken": "53292990-3645-11e8-af05-bd47a7e93b38"
+             }
+      400:
+        body:
+          application/json:
+            example: |
+             {
+               "error_message": "There was a server error",
+               "error_code": "server_error"
+             }
