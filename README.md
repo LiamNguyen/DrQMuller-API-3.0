@@ -13,3 +13,8 @@ After cloning GIT repo, run:
  - `yarn`
  - `npm i -g nodemon`
  - `nodemon`
+
+## RAML
+
+- `nodemon`
+- Access via browser: `http://localhost: 5000/docs`
