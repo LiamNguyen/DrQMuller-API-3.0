@@ -10,5 +10,7 @@ database.connect();
 appConfig(app);
 routes(app);
 
-app.listen(5000);
-console.log('Listening on port 5000...');
+module.exports.server = app.listen(5000);
+if (process.env.NODE_ENV === 'development') {
+  console.log('Listening on port 5000...');
+}

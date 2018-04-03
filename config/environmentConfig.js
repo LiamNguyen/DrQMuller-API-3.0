@@ -6,8 +6,13 @@ const config = {
     baseUrl: process.env.BASE_URL,
     frontendBaseUrl: process.env.FRONTEND_BASE_URL
   },
+  test: {
+    connectionString: 'mongodb://localhost/drqmuller_test',
+    baseUrl: 'http://localhost:5000',
+    frontendBaseUrl: 'http://localhost:3000'
+  },
   default: {
-    connectionString: 'mongodb://localhost/drqmuller',
+    connectionString: 'mongodb://localhost/drqmuller_test',
     baseUrl: 'http://localhost:5000',
     frontendBaseUrl: 'http://localhost:3000'
   }

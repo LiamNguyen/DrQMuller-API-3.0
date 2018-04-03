@@ -30,14 +30,14 @@ exports.POST_SIGNIN = (request, response, next) => {
   AuthService.signin(
     username,
     password,
-    (clientError, error, authorizationToken) => {
+    (clientError, error, loginToken) => {
       if (clientError || error) {
         response.locals.statusCode = BAD_REQUEST;
         response.locals.clientError = clientError || ApiError.server_error;
         response.locals.error = error;
         next();
       } else {
-        response.status(OK).json({ authorizationToken });
+        response.status(OK).json({ loginToken });
       }
     }
   );

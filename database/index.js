@@ -7,6 +7,7 @@ const LogTypeConstants = require('../constants/LogTypeConstants');
 exports.connect = () => {
   const { connectionString } = config.get(process.env.NODE_ENV);
 
+  mongoose.Promise = global.Promise;
   mongoose.connect(
     connectionString,
     { useMongoClient: true, promiseLibrary: global.Promise },
@@ -18,6 +19,8 @@ exports.connect = () => {
     }
   );
   mongoose.connection.once('open', () => {
-    console.log('Connected to mongodb');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Connected to mongodb');
+    }
   });
 };
