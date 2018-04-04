@@ -11,13 +11,13 @@ const config = {
     baseUrl: 'http://localhost:5000',
     frontendBaseUrl: 'http://localhost:3000'
   },
-  default: {
-    connectionString: 'mongodb://localhost/drqmuller_test',
+  development: {
+    connectionString: 'mongodb://localhost/drqmuller',
     baseUrl: 'http://localhost:5000',
     frontendBaseUrl: 'http://localhost:3000'
   }
 };
 
 exports.get = function get(env) {
-  return config[env] || config.default;
+  return config[env] || config.development;
 };

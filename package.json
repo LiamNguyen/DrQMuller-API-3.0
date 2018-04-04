@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "NODE_ENV=development nodemon",
-    "test": "eslint . && NODE_ENV=test mocha --timeout 5000",
+    "test": "eslint . && NODE_ENV=test mocha --timeout 5000 --slow 0",
     "prepush": "npm run test"
   },
   "dependencies": {
