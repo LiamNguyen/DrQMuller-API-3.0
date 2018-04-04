@@ -5,6 +5,7 @@ const UserRepository = require('../repositories/UserRepository');
 const LoginTokenRepository = require('../repositories/LoginTokenRepository');
 const CredentialsValidator = require('../lib/validators/CredentialsValidator');
 const ErrorHelper = require('../lib/ErrorHelper');
+const TokenValidator = require('../lib/validators/TokenValidator');
 
 const { getError } = ErrorHelper;
 
@@ -41,7 +42,7 @@ function usernameExist(username, callback) {
 
 exports.createUser = (username, password, callback) => {
   // Validate input
-  if (!CredentialsValidator.validate(username, password)) {
+  if (!CredentialsValidator.validateCredentials(username, password)) {
     return callback(null, getError(null, 'Credentials validation failed'));
   }
 
@@ -79,7 +80,8 @@ exports.createUser = (username, password, callback) => {
 };
 
 exports.signin = (username, password, callback) => {
-  if (!CredentialsValidator.validate(username, password)) {
+  // Validate input
+  if (!CredentialsValidator.validateCredentials(username, password)) {
     return callback(ApiError.invalid_username_or_password);
   }
   UserRepository.getUserByUsername(username, (getUserError, user) => {
@@ -115,5 +117,8 @@ exports.signin = (username, password, callback) => {
 };
 
 exports.signout = (token, callback) => {
+  if (!TokenValidator.validate(token)) {
+    return callback(getError(null, 'Token validation failed'));
+  }
   LoginTokenRepository.delete(token, callback);
 };

@@ -4,6 +4,7 @@ const EventLoggerRepository = require('../repositories/EventLoggerRepository');
 const LogTypeConstants = require('../constants/LogTypeConstants');
 const Auth = require('./Auth');
 const Docs = require('./Docs');
+const ApiError = require('../constants/ApiError');
 
 module.exports = app => {
   app.use(Auth);
@@ -23,6 +24,6 @@ module.exports = app => {
     }
     response
       .status(statusCode || BAD_REQUEST)
-      .send(clientError);
+      .send(clientError || ApiError.server_error);
   });
 };

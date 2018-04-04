@@ -5,8 +5,6 @@ const {
   UNAUTHORIZED
 } = require('http-status-codes');
 
-const ApiError = require('../constants/ApiError');
-
 const AuthService = require('../services/AuthService');
 
 exports.POST_CREATE = (request, response, next) => {
@@ -15,7 +13,7 @@ exports.POST_CREATE = (request, response, next) => {
   AuthService.createUser(username, password, (clientError, error, loginToken) => {
     if (clientError || error) {
       response.locals.statusCode = BAD_REQUEST;
-      response.locals.clientError = clientError || ApiError.server_error;
+      response.locals.clientError = clientError;
       response.locals.error = error;
       next();
     } else {
@@ -33,7 +31,7 @@ exports.POST_SIGNIN = (request, response, next) => {
     (clientError, error, loginToken) => {
       if (clientError || error) {
         response.locals.statusCode = BAD_REQUEST;
-        response.locals.clientError = clientError || ApiError.server_error;
+        response.locals.clientError = clientError;
         response.locals.error = error;
         next();
       } else {
@@ -49,7 +47,6 @@ exports.POST_SIGNOUT = (request, response, next) => {
   AuthService.signout(authorization, (error, removal) => {
     if (error || !authorization) {
       response.locals.statusCode = BAD_REQUEST;
-      response.locals.clientError = ApiError.server_error;
       response.locals.error = error;
       next();
     } else if (removal.result.n === 0) {
