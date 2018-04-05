@@ -23,6 +23,47 @@ securitySchemes:
           description: |
             Bad token.
 
+types:
+  Name:
+    type: string
+    pattern: ^[${finnish}\\-.\\s']{0,50}$
+  Address:
+    type: string
+    pattern: ^[${A-Za-zäöÄÖåÅéÉüÜ0-9}][${A-Za-zäöÄÖåÅéÉüÜ0-9}\\-.,\\/\\s'"]{0,48}[${A-Za-zäöÄÖåÅéÉüÜ0-9}]$
+  NameAddress:
+    type: object
+    properties:
+      name: Name
+      address: Address
+  Gender:
+    type: string
+    pattern: ^(?:Male|Female)$
+  Dob:
+    type: string
+    pattern: ^(19|20)\d\d[- \/.](0[1-9]|1[012])[- \/.](0[1-9]|[12][0-9]|3[01])
+  GenderDob:
+    type: object
+    properties:
+      gender: Gender
+      dob: Dob
+  Email:
+    type: string
+    pattern: ^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z\`{|}~])*@[a-zA-Z0-9](-?\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$
+  Phone:
+    type: string
+    pattern: ^\+?[0-9]+[0-9\-\s]+\\?([0-9]+\\)?[0-9\-\s]+[0-9]$
+  EmailPhone:
+    type: object
+    properties:
+      email: Email
+      phone: Phone
+  UserInformation:
+    type: object
+    properties:
+      NameAndAddress: NameAddress
+      GenderAndDob: GenderDob
+      EmailAndPhone: EmailPhone
+
 /signin:
   post:
     description: User signin
@@ -68,10 +109,10 @@ securitySchemes:
                "error_code": "server_error"
              }
       401:
-        description: Unauthorized
         body:
           application/json:
-             type: Unauthorized
+            example: |
+             {}
 
 /user:
   post:
@@ -83,7 +124,6 @@ securitySchemes:
             "username": "username1",
             "password": "password1"
           }
-    description: Create new user
     responses:
       201:
         body:
@@ -100,3 +140,45 @@ securitySchemes:
                "error_message": "There was a server error",
                "error_code": "server_error"
              }
+
+/user/me:
+  securedBy: x-token
+  put:
+    description: Update user information
+    body:
+      application/json:
+        example: |
+          {
+            "name": "Santa Clause",
+            "address": "Lapland"
+          }
+          or
+          {
+            "gender": "Male",
+            "dob": "1980/11/11"
+          }
+          or
+          {
+            "email": "santa.clause@lapland.com",
+            "phone": "0987654321"
+          }
+        type: UserInformation
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+             {}
+      400:
+        body:
+          application/json:
+            example: |
+             {
+               "error_message": "There was a server error",
+               "error_code": "server_error"
+             }
+      401:
+        body:
+          application/json:
+            example: |
+             {}
