@@ -27,6 +27,9 @@ const userSchema = mongoose.Schema({
   address: {
     type: String
   },
+  dob: {
+    type: String
+  },
   status: {
     type: String
   },

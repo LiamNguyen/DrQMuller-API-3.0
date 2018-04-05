@@ -8,7 +8,9 @@ module.exports.create = (userId, callback) => {
 };
 
 module.exports.getUserIdByToken = (token, callback) => {
-  LoginToken.findOne({ token }, callback);
+  LoginToken.findOne({ id: token }, (error, tokenDto) => {
+    callback(error, tokenDto ? tokenDto.userId : null);
+  });
 };
 
 module.exports.delete = (token, callback) => {
