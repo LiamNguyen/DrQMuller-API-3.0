@@ -48,8 +48,6 @@ describe('[Controller] Authentication', () => {
         .end((error, response) => {
           response.should.have.status(400);
           response.body.should.be.a('object');
-          response.body.should.have.property('error_message')
-            .eql(ApiError.invalid_username_or_password.error_message);
           response.body.should.have.property('error_code')
             .eql(ApiError.invalid_username_or_password.error_code);
           done();
@@ -93,8 +91,6 @@ describe('[Controller] Authentication', () => {
           .end((error, response) => {
             response.should.have.status(400);
             response.body.should.be.a('object');
-            response.body.should.have.property('error_message')
-              .eql(ApiError.username_exist.error_message);
             response.body.should.have.property('error_code')
               .eql(ApiError.username_exist.error_code);
             done();
@@ -115,8 +111,6 @@ describe('[Controller] Authentication', () => {
           .end((error, response) => {
             response.should.have.status(400);
             response.body.should.be.a('object');
-            response.body.should.have.property('error_message')
-              .eql(ApiError.server_error.error_message);
             response.body.should.have.property('error_code')
               .eql(ApiError.server_error.error_code);
             done();
