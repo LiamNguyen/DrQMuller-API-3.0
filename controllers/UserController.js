@@ -6,7 +6,7 @@ const {
 
 const UserService = require('../services/UserService');
 
-exports.PUT_INFO = (request, response, next) => {
+exports.PATCH_INFO = (request, response, next) => {
   const info = request.body;
   const { authorization } = request.headers;
 
