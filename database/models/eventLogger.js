@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const eventLoggerSchema = mongoose.Schema({
   id: {
-    type: String
+    type: String,
+    required: true
   },
   eventSource: {
     type: String

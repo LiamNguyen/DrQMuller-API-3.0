@@ -1,11 +1,16 @@
 const bcrypt = require('bcrypt');
+const moment = require('moment');
 
 const ApiError = require('../constants/ApiError');
 const UserRepository = require('../repositories/UserRepository');
 const LoginTokenRepository = require('../repositories/LoginTokenRepository');
+const TokenRepository = require('../repositories/TokenRepository');
 const CredentialsValidator = require('../lib/validators/CredentialsValidator');
 const ErrorHelper = require('../lib/ErrorHelper');
 const TokenValidator = require('../lib/validators/TokenValidator');
+const TokenType = require('../constants/TokenTypeConstants');
+const MailGun = require('../lib/MailGun');
+const resetPasswordTemplate = require('../view/EmailTemplates/ResetPasswordTemplate.ejs');
 
 const { getError } = ErrorHelper;
 
@@ -121,4 +126,48 @@ exports.signout = (token, callback) => {
     return callback(getError(null, 'Token validation failed'));
   }
   LoginTokenRepository.delete(token, callback);
+};
+
+exports.resetPassword = (email, callback) => {
+  UserRepository.getUserByEmail(email, (error, userList) => {
+    if (error) {
+      return callback(null, getError(error, 'Get user by email failed'));
+    }
+    const userIdList = userList.map(user => user.id);
+
+    TokenRepository.create(
+      userIdList,
+      TokenType.resetPassword,
+      moment().add(5, 'h').format(),
+      (createTokenError, tokenDto) => {
+        if (createTokenError) {
+          return callback(
+            null,
+            getError(
+              createTokenError,
+              `Create reset password token failed for user: ${userIdList}`
+            )
+          );
+        }
+        MailGun.send(
+          email,
+          'Forgotten password',
+          resetPasswordTemplate,
+          { resetPasswordLink: tokenDto.id },
+          (sendMailError, body) => {
+            if (sendMailError) {
+              return callback(
+                null,
+                getError(
+                  sendMailError,
+                  `Send reset password email failed for address: ${email}`
+                )
+              );
+            }
+            console.log(body);
+          }
+        );
+      }
+    );
+  });
 };

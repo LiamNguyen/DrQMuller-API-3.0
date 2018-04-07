@@ -1,13 +1,24 @@
 const mongoose = require('mongoose');
 
-const loginTokenSchema = mongoose.Schema({
+const tokenSchema = mongoose.Schema({
   id: {
     type: String,
     required: true
   },
-  userId: {
+  userIdList: {
+    type: Array,
+    required: true
+  },
+  type: {
     type: String,
     required: true
+  },
+  validUntil: {
+    type: Date,
+    require: true
+  },
+  usedAt: {
+    type: Date
   },
   createdAt: {
     type: Date,
@@ -16,7 +27,7 @@ const loginTokenSchema = mongoose.Schema({
 });
 
 module.exports = mongoose.model(
-  'LoginToken',
-  loginTokenSchema,
-  'LoginToken'
+  'Token',
+  tokenSchema,
+  'Token'
 );
