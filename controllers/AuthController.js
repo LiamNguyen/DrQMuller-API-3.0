@@ -58,3 +58,18 @@ exports.POST_SIGNOUT = (request, response, next) => {
     }
   });
 };
+
+exports.POST_RESET_PASSWORD_REQUEST = (request, response, next) => {
+  const { email } = request.body;
+
+  AuthService.resetPasswordRequest(email, (clientError, error) => {
+    if (clientError || error) {
+      response.locals.statusCode = BAD_REQUEST;
+      response.locals.clientError = clientError;
+      response.locals.error = error;
+      next();
+    } else {
+      response.status(OK).send();
+    }
+  });
+};

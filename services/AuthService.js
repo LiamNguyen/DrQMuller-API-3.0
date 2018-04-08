@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const moment = require('moment');
+const _ = require('lodash');
 
 const ApiError = require('../constants/ApiError');
 const UserRepository = require('../repositories/UserRepository');
@@ -10,9 +11,10 @@ const ErrorHelper = require('../lib/ErrorHelper');
 const TokenValidator = require('../lib/validators/TokenValidator');
 const TokenType = require('../constants/TokenTypeConstants');
 const MailGun = require('../lib/MailGun');
-const resetPasswordTemplate = require('../view/EmailTemplates/ResetPasswordTemplate.ejs');
+const RoutePathConstants = require('../constants/RoutePathConstants');
 
 const { getError } = ErrorHelper;
+const { getEmailTemplatePath } = RoutePathConstants;
 
 function encryptPassword(password, callback) {
   bcrypt.genSalt(10, (genSaltError, salt) => {
@@ -128,12 +130,16 @@ exports.signout = (token, callback) => {
   LoginTokenRepository.delete(token, callback);
 };
 
-exports.resetPassword = (email, callback) => {
+exports.resetPasswordRequest = (email, callback) => {
   UserRepository.getUserByEmail(email, (error, userList) => {
     if (error) {
       return callback(null, getError(error, 'Get user by email failed'));
     }
     const userIdList = userList.map(user => user.id);
+
+    // Return success message even if email cannot be found
+    // Security reason, avoiding automatic scanning tool from penetrating the API
+    if (_.isEmpty(userIdList)) return callback(null, null);
 
     TokenRepository.create(
       userIdList,
@@ -152,9 +158,9 @@ exports.resetPassword = (email, callback) => {
         MailGun.send(
           email,
           'Forgotten password',
-          resetPasswordTemplate,
+          `${getEmailTemplatePath()}/ResetPasswordTemplate.ejs`,
           { resetPasswordLink: tokenDto.id },
-          (sendMailError, body) => {
+          sendMailError => {
             if (sendMailError) {
               return callback(
                 null,
@@ -164,7 +170,7 @@ exports.resetPassword = (email, callback) => {
                 )
               );
             }
-            console.log(body);
+            callback(null, null);
           }
         );
       }
