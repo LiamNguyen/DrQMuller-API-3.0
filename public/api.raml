@@ -141,6 +141,30 @@ types:
                "error_code": "server_error"
              }
 
+/resetPasswordRequest:
+  post:
+    description: Send reset password request
+    body:
+      application/json:
+        example: |
+          {
+            "email": "santa.clause@lapland.com"
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+             {}
+      400:
+        body:
+          application/json:
+            example: |
+             {
+               "error_message": "There was a server error",
+               "error_code": "server_error"
+             }
+
 /user/me:
   securedBy: x-token
   patch:
