@@ -29,7 +29,7 @@ describe('[Controller] User', () => {
     it('User should be able to update [Name] and [Address]', done => {
       TestHelper.signin(username, password, (clientError, error, loginToken) => {
         chai.request(server)
-          .put('/user/me')
+          .patch('/user/me')
           .set('authorization', loginToken)
           .send({ name, address })
           .end((updateError, response) => {
@@ -43,7 +43,7 @@ describe('[Controller] User', () => {
     it('User should be able to update [Gender] and [Dob]', done => {
       TestHelper.signin(username, password, (clientError, error, loginToken) => {
         chai.request(server)
-          .put('/user/me')
+          .patch('/user/me')
           .set('authorization', loginToken)
           .send({ gender, dob })
           .end((updateError, response) => {
@@ -57,7 +57,7 @@ describe('[Controller] User', () => {
     it('User should be able to update [Email] and [Phone]', done => {
       TestHelper.signin(username, password, (clientError, error, loginToken) => {
         chai.request(server)
-          .put('/user/me')
+          .patch('/user/me')
           .set('authorization', loginToken)
           .send({ email, phone })
           .end((updateError, response) => {
@@ -70,7 +70,7 @@ describe('[Controller] User', () => {
 
     it('User should not be able to update if [Token] is incorrect', done => {
       chai.request(server)
-        .put('/user/me')
+        .patch('/user/me')
         .set('authorization', uuidv1())
         .send({ name, address })
         .end((updateError, response) => {
@@ -83,7 +83,7 @@ describe('[Controller] User', () => {
     it('User should not be able to update if [Name] or [Address] is invalid', done => {
       TestHelper.signin(username, password, (clientError, error, loginToken) => {
         chai.request(server)
-          .put('/user/me')
+          .patch('/user/me')
           .set('authorization', loginToken)
           .send({ name: `${name}_123`, address: `${address}_@#$@%^&&**__+` })
           .end((updateError, response) => {
@@ -99,7 +99,7 @@ describe('[Controller] User', () => {
     it('User should not be able to update if [Gender] or [Dob] is invalid', done => {
       TestHelper.signin(username, password, (clientError, error, loginToken) => {
         chai.request(server)
-          .put('/user/me')
+          .patch('/user/me')
           .set('authorization', loginToken)
           .send({ gender: 'BOY', dob: `${dob}_invalid` })
           .end((updateError, response) => {
@@ -115,7 +115,7 @@ describe('[Controller] User', () => {
     it('User should not be able to update if [Email] or [Phone] is invalid', done => {
       TestHelper.signin(username, password, (clientError, error, loginToken) => {
         chai.request(server)
-          .put('/user/me')
+          .patch('/user/me')
           .set('authorization', loginToken)
           .send({ email: 'invalid_email', phone: `${phone}_invalid` })
           .end((updateError, response) => {
@@ -134,7 +134,7 @@ describe('[Controller] User', () => {
       done => {
         TestHelper.signin(username, password, (clientError, error, loginToken) => {
           chai.request(server)
-            .put('/user/me')
+            .patch('/user/me')
             .set('authorization', loginToken)
             .send({ name, phone })
             .end((updateError, response) => {
@@ -154,7 +154,7 @@ describe('[Controller] User', () => {
       done => {
         TestHelper.signin(username, password, (clientError, error, loginToken) => {
           chai.request(server)
-            .put('/user/me')
+            .patch('/user/me')
             .set('authorization', loginToken)
             .send({ gender, phone })
             .end((updateError, response) => {
@@ -174,7 +174,7 @@ describe('[Controller] User', () => {
       done => {
         TestHelper.signin(username, password, (clientError, error, loginToken) => {
           chai.request(server)
-            .put('/user/me')
+            .patch('/user/me')
             .set('authorization', loginToken)
             .send({ email, name })
             .end((updateError, response) => {
