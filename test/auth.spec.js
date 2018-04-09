@@ -194,5 +194,20 @@ describe('[Controller] Authentication', () => {
           });
       }
     );
+
+    it(
+      'User should not be able to send reset password request if [Email] is invalid',
+      done => {
+        chai.request(server)
+          .post('/resetPasswordRequest')
+          .send({ email: 'invalid-email' })
+          .end((error, response) => {
+            response.should.have.status(400);
+            response.body.should.have.property('error_code')
+              .eql(ApiError.server_error.error_code);
+            done();
+          });
+      }
+    );
   });
 });

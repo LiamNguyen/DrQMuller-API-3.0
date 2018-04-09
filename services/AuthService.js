@@ -12,6 +12,7 @@ const TokenValidator = require('../lib/validators/TokenValidator');
 const TokenType = require('../constants/TokenTypeConstants');
 const MailGun = require('../lib/MailGun');
 const RoutePathConstants = require('../constants/RoutePathConstants');
+const EmailValidator = require('../lib/validators/EmailValidator');
 
 const { getError } = ErrorHelper;
 const { getEmailTemplatePath } = RoutePathConstants;
@@ -131,6 +132,10 @@ exports.signout = (token, callback) => {
 };
 
 exports.resetPasswordRequest = (email, callback) => {
+  // Validate input
+  if (!EmailValidator.validate(email)) {
+    return callback(null, getError(null, 'Email validation failed'));
+  }
   UserRepository.getUserByEmail(email, (error, userList) => {
     if (error) {
       return callback(null, getError(error, 'Get user by email failed'));
