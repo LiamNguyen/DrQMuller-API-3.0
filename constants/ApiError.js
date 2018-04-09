@@ -10,5 +10,9 @@ module.exports = {
   username_exist: {
     error_message: 'Username is already exist',
     error_code: 'username_exist'
+  },
+  token_expired: {
+    error_message: 'Token has already been expired',
+    error_code: 'token_expired'
   }
 };

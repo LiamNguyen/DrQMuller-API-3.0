@@ -38,3 +38,7 @@ module.exports.updateUserInfo = (token, info, callback) => {
     });
   });
 };
+
+module.exports.updatePasswordForUsers = (userIdList, password, callback) => {
+  User.update({ id: { $in: userIdList } }, { password }, { multi: true }, callback);
+};

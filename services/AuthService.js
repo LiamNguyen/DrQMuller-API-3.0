@@ -13,6 +13,7 @@ const TokenType = require('../constants/TokenTypeConstants');
 const MailGun = require('../lib/MailGun');
 const RoutePathConstants = require('../constants/RoutePathConstants');
 const EmailValidator = require('../lib/validators/EmailValidator');
+const TokenPasswordValidator = require('../lib/validators/TokenPasswordValidator');
 
 const { getError } = ErrorHelper;
 const { getEmailTemplatePath } = RoutePathConstants;
@@ -134,17 +135,17 @@ exports.signout = (token, callback) => {
 exports.resetPasswordRequest = (email, callback) => {
   // Validate input
   if (!EmailValidator.validate(email)) {
-    return callback(null, getError(null, 'Email validation failed'));
+    return callback(getError(null, 'Email validation failed'));
   }
   UserRepository.getUserByEmail(email, (error, userList) => {
     if (error) {
-      return callback(null, getError(error, 'Get user by email failed'));
+      return callback(getError(error, 'Get user by email failed'));
     }
     const userIdList = userList.map(user => user.id);
 
     // Return success message even if email cannot be found
     // Security reason, avoiding automatic scanning tool from penetrating the API
-    if (_.isEmpty(userIdList)) return callback(null, null);
+    if (_.isEmpty(userIdList)) return callback(null);
 
     TokenRepository.create(
       userIdList,
@@ -152,13 +153,10 @@ exports.resetPasswordRequest = (email, callback) => {
       moment().add(5, 'h').format(),
       (createTokenError, tokenDto) => {
         if (createTokenError) {
-          return callback(
-            null,
-            getError(
-              createTokenError,
-              `Create reset password token failed for user: ${userIdList}`
-            )
-          );
+          return callback(getError(
+            createTokenError,
+            `Create reset password token failed for user: ${userIdList}`
+          ));
         }
         MailGun.send(
           email,
@@ -167,18 +165,70 @@ exports.resetPasswordRequest = (email, callback) => {
           { resetPasswordLink: tokenDto.id },
           sendMailError => {
             if (sendMailError) {
-              return callback(
-                null,
-                getError(
-                  sendMailError,
-                  `Send reset password email failed for address: ${email}`
-                )
-              );
+              return callback(getError(
+                sendMailError,
+                `Send reset password email failed for address: ${email}`
+              ));
             }
-            callback(null, null);
+            callback(null);
           }
         );
       }
     );
+  });
+};
+
+exports.resetPasswordConfirm = (token, password, callback) => {
+  // Validate input
+  if (!TokenPasswordValidator.validate(token, password)) {
+    return callback(null, getError(null, 'Token or password validation failed'));
+  }
+  TokenRepository.getTokenValidity(token, (getTokenValidityError, valid) => {
+    if (getTokenValidityError) {
+      return callback(null, getError(getTokenValidityError, 'Get token validity failed'));
+    }
+    if (!valid) {
+      return callback(ApiError.token_expired);
+    }
+    TokenRepository.getUserIdListByToken(token, (error, userIdList) => {
+      if (error) {
+        return callback(null, getError(error, 'Get user Id list failed'));
+      }
+      encryptPassword(password, (encryptPasswordError, hash) => {
+        if (encryptPasswordError) {
+          return callback(null, getError(encryptPasswordError, 'Password hash error'));
+        }
+        UserRepository.updatePasswordForUsers(
+          userIdList,
+          hash,
+          (updatePwdError, updateResult) => {
+            if (updatePwdError) {
+              return callback(null, getError(updatePwdError, 'Reset password failed'));
+            }
+            if (!updateResult || updateResult.n === 0) {
+              return callback(
+                null,
+                getError(null, `Reset password failed for token ${token}`)
+              );
+            }
+            TokenRepository.markTokenAsUsed(token, (markedTokenAsUsedError, result) => {
+              if (markedTokenAsUsedError) {
+                return callback(
+                  null,
+                  getError(markedTokenAsUsedError, 'Mark token as used failed')
+                );
+              }
+              if (!result || result.n === 0) {
+                return callback(
+                  null,
+                  getError(null, `Mark token as used failed for ${token}`)
+                );
+              }
+              callback(null, null);
+            });
+          }
+        );
+      });
+    });
   });
 };

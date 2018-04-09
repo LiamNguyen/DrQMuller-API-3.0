@@ -62,7 +62,21 @@ exports.POST_SIGNOUT = (request, response, next) => {
 exports.POST_RESET_PASSWORD_REQUEST = (request, response, next) => {
   const { email } = request.body;
 
-  AuthService.resetPasswordRequest(email, (clientError, error) => {
+  AuthService.resetPasswordRequest(email, error => {
+    if (error) {
+      response.locals.statusCode = BAD_REQUEST;
+      response.locals.error = error;
+      next();
+    } else {
+      response.status(OK).send();
+    }
+  });
+};
+
+exports.PATCH_RESET_PASSWORD_REQUEST = (request, response, next) => {
+  const { token, password } = request.body;
+
+  AuthService.resetPasswordConfirm(token, password, (clientError, error) => {
     if (clientError || error) {
       response.locals.statusCode = BAD_REQUEST;
       response.locals.clientError = clientError;
