@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'test';
+
 const { describe, it, beforeEach } = require('mocha');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -82,19 +84,22 @@ describe('[Controller] User', () => {
     });
 
     it('User should not be able to update if [Token] is incorrect', done => {
-      chai.request(server)
-        .patch('/user/me')
-        .set('authorization', uuidv1())
-        .send({ name, address })
-        .end((updateError, response) => {
-          response.should.have.status(401);
-          response.body.should.be.a('object').eql({});
-          User.findOne({ username }, (e, user) => {
-            should.equal(user.name, undefined);
-            should.equal(user.address, undefined);
+      TestHelper.signin(username, password, () => {
+        chai.request(server)
+          .patch('/user/me')
+          .set('authorization', uuidv1())
+          .send({ name, address })
+          .end((updateError, response) => {
+            response.should.have.status(401);
+            response.body.should.be.a('object').eql({});
+            User.findOne({ username }, (e, user) => {
+              should.not.equal(user, null);
+              should.equal(user.name, undefined);
+              should.equal(user.address, undefined);
+            });
+            done();
           });
-          done();
-        });
+      });
     });
 
     it('User should not be able to update if [Name] or [Address] is invalid', done => {

@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'test';
+
 const { describe, it, beforeEach } = require('mocha');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -8,11 +10,12 @@ const { server } = require('../server');
 const AuthService = require('../services/AuthService');
 const LoginToken = require('../database/models/loginToken');
 const User = require('../database/models/user');
+const Token = require('../database/models/token');
 const ApiError = require('../constants/ApiError');
 const TestHelper = require('./TestHelper');
 
 chai.use(chaiHttp);
-chai.should();
+const should = chai.should();
 
 describe('[Controller] Authentication', () => {
   beforeEach(done => {
@@ -150,5 +153,46 @@ describe('[Controller] Authentication', () => {
           done();
         });
     });
+  });
+
+  describe('POST /resetPasswordRequest', () => {
+    it('User should be able to send reset password request', done => {
+      const email = 'thienphuc1996.nguyen@gmail.com';
+      const username = 'username1';
+
+      TestHelper.createUser(username, 'password1', { email }, (error, user) => {
+        chai.request(server)
+          .post('/resetPasswordRequest')
+          .send({ email })
+          .end((resetPasswordError, response) => {
+            response.should.have.status(200);
+            response.body.should.be.a('object').eql({});
+            Token.find({}, (e, result) => {
+              should.not.equal(result, undefined);
+              result.length.should.eql(1);
+              result[0].userIdList[0].should.eql(user.id);
+            });
+            done();
+          });
+      });
+    });
+
+    it(
+      'User should receive success message even though the email could not be found',
+      done => {
+        chai.request(server)
+          .post('/resetPasswordRequest')
+          .send({ email: 'some.random@email.com' })
+          .end((error, response) => {
+            response.should.have.status(200);
+            response.body.should.be.a('object').eql({});
+            Token.find({}, (e, result) => {
+              should.not.equal(result, null);
+              result.length.should.eql(0);
+            });
+            done();
+          });
+      }
+    );
   });
 });
