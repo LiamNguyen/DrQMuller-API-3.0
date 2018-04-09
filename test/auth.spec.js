@@ -129,6 +129,9 @@ describe('[Controller] Authentication', () => {
           .end((signoutError, response) => {
             response.should.have.status(200);
             response.body.should.be.a('object').eql({});
+            LoginToken.findOne({ id: response.body.loginToken }, (e, result) => {
+              result.should.be.eql(null);
+            });
             done();
           });
       });
@@ -136,6 +139,7 @@ describe('[Controller] Authentication', () => {
 
     it('User should not be able to sign out when login token does not exist', done => {
       const randomToken = uuidv1();
+
       chai.request(server)
         .post('/signout')
         .set('authorization', randomToken)

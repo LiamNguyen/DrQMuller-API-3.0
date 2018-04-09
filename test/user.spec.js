@@ -7,9 +7,10 @@ const uuidv1 = require('uuid/v1');
 const { server } = require('../server');
 const ApiError = require('../constants/ApiError');
 const TestHelper = require('./TestHelper');
+const User = require('../database/models/user');
 
 chai.use(chaiHttp);
-chai.should();
+const should = chai.should();
 
 describe('[Controller] User', () => {
   beforeEach(done => {
@@ -35,6 +36,10 @@ describe('[Controller] User', () => {
           .end((updateError, response) => {
             response.should.have.status(200);
             response.body.should.be.a('object').eql({});
+            User.findOne({ username }, (e, user) => {
+              user.name.should.be.eql(name);
+              user.address.should.be.eql(address);
+            });
             done();
           });
       });
@@ -49,6 +54,10 @@ describe('[Controller] User', () => {
           .end((updateError, response) => {
             response.should.have.status(200);
             response.body.should.be.a('object').eql({});
+            User.findOne({ username }, (e, user) => {
+              user.gender.should.be.eql(gender);
+              user.dob.should.be.eql(dob);
+            });
             done();
           });
       });
@@ -63,6 +72,10 @@ describe('[Controller] User', () => {
           .end((updateError, response) => {
             response.should.have.status(200);
             response.body.should.be.a('object').eql({});
+            User.findOne({ username }, (e, user) => {
+              user.email.should.be.eql(email);
+              user.phone.should.be.eql(phone);
+            });
             done();
           });
       });
@@ -76,6 +89,10 @@ describe('[Controller] User', () => {
         .end((updateError, response) => {
           response.should.have.status(401);
           response.body.should.be.a('object').eql({});
+          User.findOne({ username }, (e, user) => {
+            should.equal(user.name, undefined);
+            should.equal(user.address, undefined);
+          });
           done();
         });
     });
@@ -91,6 +108,10 @@ describe('[Controller] User', () => {
             response.body.should.be.a('object');
             response.body.should.have.property('error_code')
               .eql(ApiError.server_error.error_code);
+            User.findOne({ username }, (e, user) => {
+              should.equal(user.name, undefined);
+              should.equal(user.address, undefined);
+            });
             done();
           });
       });
@@ -107,6 +128,10 @@ describe('[Controller] User', () => {
             response.body.should.be.a('object');
             response.body.should.have.property('error_code')
               .eql(ApiError.server_error.error_code);
+            User.findOne({ username }, (e, user) => {
+              should.equal(user.gender, undefined);
+              should.equal(user.dob, undefined);
+            });
             done();
           });
       });
@@ -123,6 +148,10 @@ describe('[Controller] User', () => {
             response.body.should.be.a('object');
             response.body.should.have.property('error_code')
               .eql(ApiError.server_error.error_code);
+            User.findOne({ username }, (e, user) => {
+              should.equal(user.email, undefined);
+              should.equal(user.phone, undefined);
+            });
             done();
           });
       });
@@ -142,6 +171,10 @@ describe('[Controller] User', () => {
               response.body.should.be.a('object');
               response.body.should.have.property('error_code')
                 .eql(ApiError.server_error.error_code);
+              User.findOne({ username }, (e, user) => {
+                should.equal(user.name, undefined);
+                should.equal(user.address, undefined);
+              });
               done();
             });
         });
@@ -162,6 +195,10 @@ describe('[Controller] User', () => {
               response.body.should.be.a('object');
               response.body.should.have.property('error_code')
                 .eql(ApiError.server_error.error_code);
+              User.findOne({ username }, (e, user) => {
+                should.equal(user.gender, undefined);
+                should.equal(user.phone, undefined);
+              });
               done();
             });
         });
@@ -182,6 +219,10 @@ describe('[Controller] User', () => {
               response.body.should.be.a('object');
               response.body.should.have.property('error_code')
                 .eql(ApiError.server_error.error_code);
+              User.findOne({ username }, (e, user) => {
+                should.equal(user.email, undefined);
+                should.equal(user.name, undefined);
+              });
               done();
             });
         });
