@@ -12,7 +12,7 @@ const config = {
   test: {
     connectionString: 'mongodb://localhost/drqmuller_test',
     baseUrl: 'http://localhost:5000',
-    frontendBaseUrl: 'http://localhost:3000',
+    frontendBaseUrl: 'http://localhost:8081',
     mailGunApiKey: 'key-5cc62710de03e82e4e5985ffaa7b6115',
     mailGunDomain: 'sandboxbd5eb4fadeb8426580775a1abe106ac5.mailgun.org',
     mailSentFrom: 'no-reply@drqmuller.com'
