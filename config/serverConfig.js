@@ -3,12 +3,15 @@ const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+
 const requestMiddleware = require('../middlewares/RequestMiddleware');
 const server = require('../server');
 
 module.exports = app => {
   const { rootDirectory } = server;
 
+  app.use(helmet());
   app.use(cors());
   app.use(bodyParser.json());
   app.use(fileUpload());

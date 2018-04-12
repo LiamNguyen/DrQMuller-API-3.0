@@ -3,7 +3,7 @@ const fs = require('fs');
 const https = require('https');
 
 const database = require('./database');
-const appConfig = require('./config/serverConfig');
+const serverConfig = require('./config/serverConfig');
 const routes = require('./routes');
 
 const sslkey = fs.readFileSync('./certificates/ssl-key.pem');
@@ -15,7 +15,7 @@ const app = express();
 
 module.exports.rootDirectory = __dirname;
 database.connect();
-appConfig(app);
+serverConfig(app);
 routes(app);
 
 if (process.env.NODE_ENV === 'test') {
