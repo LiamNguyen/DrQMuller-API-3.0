@@ -10,7 +10,7 @@
     "generate_raml": "magicli lib/RamlGenerator.js generate"
   },
   "dependencies": {
-    "bcrypt": "^1.0.3",
+    "bcrypt": "^2.0.0",
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
     "create-raml": "^3.2.3",
@@ -27,11 +27,11 @@
     "magicli": "^0.1.2",
     "mailgun-js": "^0.16.0",
     "moment": "^2.21.0",
-    "mongoose": "^4.11.13",
+    "mongoose": "^4.13.12",
     "mongoose-guid": "^1.0.2",
-    "node": "^8.3.0",
-    "nodemon": "^1.12.1",
-    "raml2html": "^7.0.0",
+    "node": "^8.11.1",
+    "nodemon": "^1.17.3",
+    "raml2html": "^7.1.0",
     "uuid": "^3.2.1"
   },
   "author": "Liam Nguyen",
