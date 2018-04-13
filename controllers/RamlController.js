@@ -4,9 +4,9 @@ const ApiError = require('../constants/ApiError');
 const config = require('../config/environmentConfig');
 
 exports.GET = (request, response, next) => {
-  const { baseUrl } = config.get(process.env.NODE_ENV);
+  const { ramlBaseUrl } = config.get(process.env.NODE_ENV);
   raml2html.render(
-    `${baseUrl}/public/api.raml`,
+    `${ramlBaseUrl}/public/api.raml`,
     raml2html.getConfigForTheme()
   ).then(result => {
     response.send(result);

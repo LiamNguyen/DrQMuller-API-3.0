@@ -23,6 +23,8 @@ if (process.env.NODE_ENV === 'test') {
 } else {
   module.exports.server = https.createServer(options, app).listen(5000);
   if (process.env.NODE_ENV === 'development') {
+    // Serve at this port only for raml specs
+    app.listen(8080);
     console.log('Project is running at https://localhost:5000');
   }
 }
