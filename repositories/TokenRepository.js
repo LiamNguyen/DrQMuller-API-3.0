@@ -39,6 +39,10 @@ module.exports.getTokenValidity = (token, callback) => {
     if (!tokenDto) {
       return callback(getError(null, `Token: ${token} cannot be found`));
     }
-    callback(null, moment(tokenDto.validUntil).isAfter(moment()));
+    callback(
+      null,
+      moment(tokenDto.validUntil).isAfter(moment()) ||
+      tokenDto.usedAt != null
+    );
   });
 };
