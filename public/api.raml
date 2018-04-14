@@ -165,6 +165,38 @@ types:
                "error_code": "server_error"
              }
 
+
+/resetPasswordConfirm:
+  securedBy: x-token
+  patch:
+    description: Reset password
+    body:
+      application/json:
+        example: |
+          {
+            "token": "158033AE-1B43-4FF0-B2AE-F9D58170127B",
+            "password": "newpassword1234"
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+             {}
+      400:
+        body:
+          application/json:
+            example: |
+             {
+               "error_message": "There was a server error",
+               "error_code": "server_error"
+             }
+             or
+             {
+                "error_message": "Token has already been expired",
+                "error_code": "token_expired"
+             }
+
 /user/me:
   securedBy: x-token
   patch:
