@@ -73,7 +73,7 @@ exports.POST_RESET_PASSWORD_REQUEST = (request, response, next) => {
   });
 };
 
-exports.PATCH_RESET_PASSWORD_REQUEST = (request, response, next) => {
+exports.PATCH_RESET_PASSWORD_CONFIRM = (request, response, next) => {
   const { token, password } = request.body;
 
   AuthService.resetPasswordConfirm(token, password, (clientError, error) => {
