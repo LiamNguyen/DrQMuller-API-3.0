@@ -20,10 +20,19 @@ const tokenSchema = mongoose.Schema({
   usedAt: {
     type: Date
   },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  },
   createdAt: {
     type: Date,
     default: Date.now
   }
+});
+
+// eslint-disable-next-line func-names
+tokenSchema.pre('update', function () {
+  this.update({}, { $set: { updatedAt: new Date() } });
 });
 
 module.exports = mongoose.model(

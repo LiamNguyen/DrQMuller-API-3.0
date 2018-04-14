@@ -48,6 +48,11 @@ const userSchema = mongoose.Schema({
   }
 });
 
+// eslint-disable-next-line func-names
+userSchema.pre('update', function () {
+  this.update({}, { $set: { updatedAt: new Date() } });
+});
+
 module.exports = mongoose.model(
   'User',
   userSchema,
