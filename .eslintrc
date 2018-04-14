@@ -26,7 +26,8 @@
     }],
     "comma-dangle": "off",
     "arrow-parens": ["error", "as-needed"],
-    "consistent-return": "off"
+    "consistent-return": "off",
+    "radix": ["off"]
   },
   "env": {
     "node": true

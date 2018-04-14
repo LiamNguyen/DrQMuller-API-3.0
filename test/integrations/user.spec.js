@@ -6,10 +6,10 @@ const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
 const uuidv1 = require('uuid/v1');
 
-const { server } = require('../server');
-const ApiError = require('../constants/ApiError');
-const TestHelper = require('./TestHelper');
-const User = require('../database/models/user');
+const { server } = require('../../server');
+const ApiError = require('../../constants/ApiError');
+const TestHelper = require('../TestHelper');
+const User = require('../../database/models/user');
 
 chai.use(chaiHttp);
 const should = chai.should();
