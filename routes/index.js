@@ -5,12 +5,14 @@ const LogTypeConstants = require('../constants/LogTypeConstants');
 const Auth = require('./Auth');
 const Docs = require('./Docs');
 const User = require('./User');
+const Booking = require('./Booking');
 const ApiError = require('../constants/ApiError');
 
 module.exports = app => {
   app.use(Auth);
   app.use(Docs);
   app.use(User);
+  app.use(Booking);
 
   // Error handler
   app.use((request, response) => {

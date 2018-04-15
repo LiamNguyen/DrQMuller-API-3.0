@@ -25,3 +25,13 @@ module.exports.addSchedule = (id, schedule, callback) => {
     Machine.update({ id }, { $set: { schedules } }, callback);
   });
 };
+
+// Integration test purpose only
+module.exports.overwriteSchedules = (id, schedules, callback) => {
+  Machine.findOne({ id }, error => {
+    if (error) {
+      return callback(error);
+    }
+    Machine.update({ id }, { $set: { schedules } }, callback);
+  });
+};

@@ -14,5 +14,9 @@ module.exports = {
   token_expired: {
     error_message: 'Token has already been expired',
     error_code: 'token_expired'
+  },
+  unauthorized: {
+    error_message: 'Unauthorized',
+    error_code: 'unauthorized'
   }
 };
