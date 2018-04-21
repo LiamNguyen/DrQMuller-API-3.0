@@ -31,6 +31,7 @@ module.exports.addSchedule = (id, schedule, callback) => {
 
 // Integration test purpose only
 module.exports.overwriteSchedules = (id, schedules, callback) => {
+  if (process.env.NODE_ENV !== 'test') return;
   Machine.findOne({ id }, error => {
     if (error) {
       return callback(error);

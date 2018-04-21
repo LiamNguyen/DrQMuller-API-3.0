@@ -5,10 +5,17 @@
   "main": "server.js",
   "scripts": {
     "start": "NODE_ENV=development nodemon",
-    "test": "eslint . && NODE_ENV=test mocha \"test/**/*.js\" --slow 0",
+    "test": "npm run lint && NODE_ENV=test mocha \"test/**/*.js\" --slow 0",
+    "lint": "eslint . --cache --ignore-pattern .gitignore --color --quiet",
     "prepush": "npm run test",
     "generate_raml": "magicli lib/RamlGenerator.js generate",
     "format": "prettier --single-quote --write \"**/*.js\" \"*.js\""
+  },
+  "lint-staged": {
+    "**/*.js": [
+      "eslint --cache --ignore-pattern .gitignore --color",
+      "git add"
+    ]
   },
   "dependencies": {
     "bcrypt": "^2.0.0",

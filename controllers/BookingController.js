@@ -1,13 +1,12 @@
-const { OK, BAD_REQUEST, UNAUTHORIZED } = require('http-status-codes');
+const { OK, BAD_REQUEST, UNAUTHORIZED, CREATED } = require('http-status-codes');
 
 const BookingService = require('../services/BookingService');
 
 exports.GET_AVAILABLE_TIME = (request, response, next) => {
   const {
     query: { machineId, date },
-    headers
+    headers: { authorization }
   } = request;
-  const { authorization } = headers;
 
   BookingService.getAvailableTimes(
     authorization,
@@ -21,6 +20,29 @@ exports.GET_AVAILABLE_TIME = (request, response, next) => {
         next();
       } else {
         response.status(OK).json(availableTime);
+      }
+    }
+  );
+};
+
+exports.CREATE_APPOINTMENT = (request, response, next) => {
+  const {
+    body: { machineId, schedule },
+    headers: { authorization }
+  } = request;
+
+  BookingService.createAppointment(
+    authorization,
+    machineId,
+    schedule,
+    (clientError, error) => {
+      if (clientError || error) {
+        response.locals.statusCode = clientError ? UNAUTHORIZED : BAD_REQUEST;
+        response.locals.clientError = clientError;
+        response.locals.error = error;
+        next();
+      } else {
+        response.status(CREATED).send();
       }
     }
   );

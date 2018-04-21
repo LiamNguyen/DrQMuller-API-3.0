@@ -195,6 +195,7 @@ describe('[Controller] Authentication', () => {
       });
     });
 
+    // eslint-disable-next-line max-len
     it('User should receive success message even though the email could not be found', done => {
       chai
         .request(server)
@@ -211,6 +212,7 @@ describe('[Controller] Authentication', () => {
         });
     });
 
+    // eslint-disable-next-line max-len
     it('User should not be able to send reset password request if [Email] is invalid', done => {
       chai
         .request(server)

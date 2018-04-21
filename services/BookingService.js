@@ -8,6 +8,8 @@ const LoginTokenRepository = require('../repositories/LoginTokenRepository');
 const ApiError = require('../constants/ApiError');
 const TokenValidator = require('../lib/validators/TokenValidator');
 const DateValidator = require('../lib/validators/DateValidator');
+const NewAppointmentValidator = require('../lib/validators/NewAppointmentValidator');
+const AppointmentRepository = require('../repositories/AppointmentRepository');
 
 const {
   morningShiftStartTime,
@@ -23,7 +25,6 @@ function getAvailableList(machineId, date, startTime, endTime, callback) {
   const result = [];
   let time = startTime;
 
-  // eslint-disable-next-line no-loop-func
   MachineRepository.getById(machineId, (error, machines) => {
     if (error) {
       return callback(getError(error, 'Get machine by Id failed'));
@@ -94,5 +95,48 @@ exports.getAvailableTimes = (token, machineId, date, callback) => {
         );
       }
     );
+  });
+};
+
+exports.createAppointment = (token, machineId, schedule, callback) => {
+  // Validate input
+  if (!NewAppointmentValidator.validate(token, machineId, schedule)) {
+    return callback(null, getError(null, 'New appointment validation failed'));
+  }
+  LoginTokenRepository.getUserIdByToken(token, (error, userId) => {
+    if (error) {
+      return callback(null, getError(error, 'Get userId by token failed'));
+    }
+    if (!userId) {
+      return callback(ApiError.unauthorized);
+    }
+    MachineRepository.getById(machineId, (error, machines) => {
+      if (error) {
+        return callback(null, getError(error, 'Get machine by Id failed'));
+      }
+      if (_.isEmpty(machines)) {
+        return callback(null, getError(null, 'Machine not found'));
+      }
+      AppointmentRepository.create(userId, machineId, schedule, error => {
+        if (error) {
+          return callback(null, getError(error, 'Create appointment failed'));
+        }
+        MachineRepository.addSchedule(
+          machineId,
+          schedule,
+          (addScheduleError, result) => {
+            if (addScheduleError || result.n === 0) {
+              return callback(
+                null,
+                getError(addScheduleError, 'Add schedule failed')
+              );
+            }
+            // TODO: Release booking in temporary collection
+            // TODO: Send email to customer service
+            // TODO: Push notification via Socket.io to management portal
+          }
+        );
+      });
+    });
   });
 };
