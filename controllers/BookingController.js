@@ -1,13 +1,12 @@
-const {
-  OK,
-  BAD_REQUEST,
-  UNAUTHORIZED
-} = require('http-status-codes');
+const { OK, BAD_REQUEST, UNAUTHORIZED } = require('http-status-codes');
 
 const BookingService = require('../services/BookingService');
 
 exports.GET_AVAILABLE_TIME = (request, response, next) => {
-  const { query: { machineId, date }, headers } = request;
+  const {
+    query: { machineId, date },
+    headers
+  } = request;
   const { authorization } = headers;
 
   BookingService.getAvailableTimes(

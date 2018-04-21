@@ -63,6 +63,46 @@ types:
       NameAndAddress: NameAddress
       GenderAndDob: GenderDob
       EmailAndPhone: EmailPhone
+  UUID:
+    type: string
+    pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+  Date:
+    type: string
+    pattern: ^\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$
+
+/availableTime:
+  securedBy: x-token
+  get:
+    description: Retrieve available time for appointment booking
+    queryParameters:
+      date: Date
+      machineId: UUID
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+             [
+               "06:00",
+               "06:15",
+               "06:45",
+               "07:15",
+               "07:30",
+               "07:45",
+             ]
+      400:
+        body:
+          application/json:
+            example: |
+             {
+               "error_message": "There was a server error",
+               "error_code": "server_error"
+             }
+      401:
+        body:
+          application/json:
+            example: |
+             {}
 
 /signin:
   post:

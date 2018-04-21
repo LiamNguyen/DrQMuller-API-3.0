@@ -7,12 +7,15 @@ const { getError } = require('../lib/ErrorHelper');
 module.exports.create = (userIdList, type, validUntil, callback) => {
   const id = uuidv1();
 
-  Token.create({
-    id,
-    userIdList,
-    type,
-    validUntil
-  }, callback);
+  Token.create(
+    {
+      id,
+      userIdList,
+      type,
+      validUntil
+    },
+    callback
+  );
 };
 
 module.exports.getUserIdListByToken = (token, callback) => {
@@ -41,8 +44,7 @@ module.exports.getTokenValidity = (token, callback) => {
     }
     callback(
       null,
-      moment(tokenDto.validUntil).isAfter(moment()) ||
-      tokenDto.usedAt != null
+      moment(tokenDto.validUntil).isAfter(moment()) || tokenDto.usedAt != null
     );
   });
 };

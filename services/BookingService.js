@@ -16,10 +16,7 @@ const {
   afternoonShiftEndTime,
   period
 } = BookingConstants;
-const {
-  isTimeAfter,
-  addMinutes
-} = TimeHelper;
+const { isTimeAfter, addMinutes } = TimeHelper;
 const { getError } = ErrorHelper;
 
 function getAvailableList(machineId, date, startTime, endTime, callback) {

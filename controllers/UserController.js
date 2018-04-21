@@ -1,8 +1,4 @@
-const {
-  OK,
-  BAD_REQUEST,
-  UNAUTHORIZED
-} = require('http-status-codes');
+const { OK, BAD_REQUEST, UNAUTHORIZED } = require('http-status-codes');
 
 const UserService = require('../services/UserService');
 

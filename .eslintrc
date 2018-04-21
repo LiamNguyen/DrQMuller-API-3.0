@@ -1,8 +1,12 @@
 {
+  "plugins": [
+    "react",
+    "prettier"
+  ],
   "extends": [
     "eslint:recommended",
     "airbnb",
-    "plugin:react/recommended"
+    "prettier"
   ],
   "parserOptions": {
     "ecmaVersion": 6,
@@ -27,7 +31,24 @@
     "comma-dangle": "off",
     "arrow-parens": ["error", "as-needed"],
     "consistent-return": "off",
-    "radix": ["off"]
+    "radix": ["off"],
+    "no-undef-init": 0,
+    "no-undef": 2,
+    "quotes": ["off", "single"],
+    "arrow-spacing": "error",
+    "react/jsx-uses-react": "error",
+    "no-constant-condition": "off",
+    "semi": "off",
+    "global-require": "off",
+    "no-shadow": "off",
+    "no-unused-expressions": "off",
+    "prettier/prettier": [
+      "error",
+      {
+        "singleQuote": true
+      }
+    ]
+
   },
   "env": {
     "node": true

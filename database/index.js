@@ -14,7 +14,10 @@ exports.connect = () => {
     error => {
       if (error) {
         console.log(error);
-        EventLoggerRepository.createLocalError(LogTypeConstants.localError, error);
+        EventLoggerRepository.createLocalError(
+          LogTypeConstants.localError,
+          error
+        );
       }
     }
   );

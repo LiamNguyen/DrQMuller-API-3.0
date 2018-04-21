@@ -13,10 +13,7 @@ const {
   afternoonShiftEndTime,
   period
 } = BookingConstants;
-const {
-  isTimeAfter,
-  addMinutes
-} = TimeHelper;
+const { isTimeAfter, addMinutes } = TimeHelper;
 
 module.exports = {
   signin: (username, password, callback) => {

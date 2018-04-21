@@ -26,20 +26,25 @@ describe('[Controller] Booking', () => {
 
     it('User should be able to get available time', done => {
       MachineRepository.create('Machine 1', (error, machine) => {
-        TestHelper.signin(username, password, (clientError, signinError, loginToken) => {
-          chai.request(server)
-            .get(`/availableTime?machineId=${machine.id}&date=${today}`)
-            .set('authorization', loginToken)
-            .send()
-            .end((getTimeError, response) => {
-              response.should.have.status(200);
-              should.equal(
-                _.isEqual(response.body, TestHelper.mockAvailableTime([])),
-                true
-              );
-              done();
-            });
-        });
+        TestHelper.signin(
+          username,
+          password,
+          (clientError, signinError, loginToken) => {
+            chai
+              .request(server)
+              .get(`/availableTime?machineId=${machine.id}&date=${today}`)
+              .set('authorization', loginToken)
+              .send()
+              .end((getTimeError, response) => {
+                response.should.have.status(200);
+                should.equal(
+                  _.isEqual(response.body, TestHelper.mockAvailableTime([])),
+                  true
+                );
+                done();
+              });
+          }
+        );
       });
     });
 
@@ -52,7 +57,8 @@ describe('[Controller] Booking', () => {
             username,
             password,
             (clientError, signinError, loginToken) => {
-              chai.request(server)
+              chai
+                .request(server)
                 .get(`/availableTime?machineId=${machineId}&date=${today}`)
                 .set('authorization', loginToken)
                 .send()

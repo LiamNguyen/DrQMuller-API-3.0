@@ -31,12 +31,8 @@ const tokenSchema = mongoose.Schema({
 });
 
 // eslint-disable-next-line func-names
-tokenSchema.pre('update', function () {
+tokenSchema.pre('update', function() {
   this.update({}, { $set: { updatedAt: new Date() } });
 });
 
-module.exports = mongoose.model(
-  'Token',
-  tokenSchema,
-  'Token'
-);
+module.exports = mongoose.model('Token', tokenSchema, 'Token');

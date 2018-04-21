@@ -5,10 +5,13 @@ const Machine = require('../database/models/machine');
 module.exports.create = (name, callback) => {
   const id = uuidv1();
 
-  Machine.create({
-    id,
-    name
-  }, callback);
+  Machine.create(
+    {
+      id,
+      name
+    },
+    callback
+  );
 };
 
 module.exports.getById = (id, callback) => {
