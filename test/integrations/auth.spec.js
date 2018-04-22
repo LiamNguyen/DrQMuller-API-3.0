@@ -174,7 +174,7 @@ describe('[Controller] Authentication', () => {
 
   describe('POST /resetPasswordRequest', () => {
     it('User should be able to send reset password request', done => {
-      const email = 'thienphuc1996.nguyen@gmail.com';
+      const email = 'christranhaha@gmail.com';
       const username = 'username1';
 
       TestHelper.createUser(username, 'password1', { email }, (error, user) => {
