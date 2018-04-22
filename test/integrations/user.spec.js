@@ -1,6 +1,6 @@
 process.env.NODE_ENV = 'test';
 
-const { describe, it, beforeEach } = require('mocha');
+const { describe, it, afterEach } = require('mocha');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
@@ -15,7 +15,7 @@ chai.use(chaiHttp);
 const should = chai.should();
 
 describe('[Controller] User', () => {
-  beforeEach(done => {
+  afterEach(done => {
     mongoose.connection.db.dropDatabase(() => done());
   });
 
@@ -45,8 +45,8 @@ describe('[Controller] User', () => {
               User.findOne({ username }, (e, user) => {
                 user.name.should.be.eql(name);
                 user.address.should.be.eql(address);
+                done();
               });
-              done();
             });
         }
       );
@@ -68,8 +68,8 @@ describe('[Controller] User', () => {
               User.findOne({ username }, (e, user) => {
                 user.gender.should.be.eql(gender);
                 user.dob.should.be.eql(dob);
+                done();
               });
-              done();
             });
         }
       );
@@ -91,8 +91,8 @@ describe('[Controller] User', () => {
               User.findOne({ username }, (e, user) => {
                 user.email.should.be.eql(email);
                 user.phone.should.be.eql(phone);
+                done();
               });
-              done();
             });
         }
       );
@@ -112,8 +112,8 @@ describe('[Controller] User', () => {
               should.not.equal(user, null);
               should.equal(user.name, undefined);
               should.equal(user.address, undefined);
+              done();
             });
-            done();
           });
       });
     });
@@ -137,8 +137,8 @@ describe('[Controller] User', () => {
               User.findOne({ username }, (e, user) => {
                 should.equal(user.name, undefined);
                 should.equal(user.address, undefined);
+                done();
               });
-              done();
             });
         }
       );
@@ -163,8 +163,8 @@ describe('[Controller] User', () => {
               User.findOne({ username }, (e, user) => {
                 should.equal(user.gender, undefined);
                 should.equal(user.dob, undefined);
+                done();
               });
-              done();
             });
         }
       );
@@ -189,8 +189,8 @@ describe('[Controller] User', () => {
               User.findOne({ username }, (e, user) => {
                 should.equal(user.email, undefined);
                 should.equal(user.phone, undefined);
+                done();
               });
-              done();
             });
         }
       );
@@ -216,8 +216,8 @@ describe('[Controller] User', () => {
               User.findOne({ username }, (e, user) => {
                 should.equal(user.name, undefined);
                 should.equal(user.address, undefined);
+                done();
               });
-              done();
             });
         }
       );
@@ -243,8 +243,8 @@ describe('[Controller] User', () => {
               User.findOne({ username }, (e, user) => {
                 should.equal(user.gender, undefined);
                 should.equal(user.phone, undefined);
+                done();
               });
-              done();
             });
         }
       );
@@ -270,8 +270,8 @@ describe('[Controller] User', () => {
               User.findOne({ username }, (e, user) => {
                 should.equal(user.email, undefined);
                 should.equal(user.name, undefined);
+                done();
               });
-              done();
             });
         }
       );

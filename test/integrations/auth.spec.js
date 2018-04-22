@@ -1,6 +1,6 @@
 process.env.NODE_ENV = 'test';
 
-const { describe, it, beforeEach } = require('mocha');
+const { describe, it, afterEach } = require('mocha');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
@@ -18,7 +18,7 @@ chai.use(chaiHttp);
 const should = chai.should();
 
 describe('[Controller] Authentication', () => {
-  beforeEach(done => {
+  afterEach(done => {
     mongoose.connection.db.dropDatabase(() => done());
   });
 
@@ -41,9 +41,9 @@ describe('[Controller] Authentication', () => {
               { id: response.body.loginToken },
               (e, result) => {
                 result.should.not.eql(null);
+                done();
               }
             );
-            done();
           });
       });
     });
@@ -81,12 +81,12 @@ describe('[Controller] Authentication', () => {
             { id: response.body.loginToken },
             (loginTokenError, result) => {
               result.should.not.eql(null);
+              User.find({}, (userError, result) => {
+                result.length.should.eql(1);
+                done();
+              });
             }
           );
-          User.find({}, (userError, result) => {
-            result.length.should.eql(1);
-          });
-          done();
         });
     });
 
@@ -147,10 +147,10 @@ describe('[Controller] Authentication', () => {
               LoginToken.findOne(
                 { id: response.body.loginToken },
                 (e, result) => {
-                  result.should.be.eql(null);
+                  should.equal(result, null);
+                  done();
                 }
               );
-              done();
             });
         }
       );
@@ -189,8 +189,8 @@ describe('[Controller] Authentication', () => {
               should.not.equal(result, undefined);
               result.length.should.eql(1);
               result[0].userIdList[0].should.eql(user.id);
+              done();
             });
-            done();
           });
       });
     });
@@ -207,8 +207,8 @@ describe('[Controller] Authentication', () => {
           Token.find({}, (e, result) => {
             should.not.equal(result, null);
             result.length.should.eql(0);
+            done();
           });
-          done();
         });
     });
 

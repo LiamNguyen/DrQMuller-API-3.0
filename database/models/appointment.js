@@ -14,7 +14,7 @@ const appointmentSchema = mongoose.Schema({
     required: true
   },
   schedule: {
-    type: Array,
+    type: Object,
     required: true
   },
   updatedAt: {

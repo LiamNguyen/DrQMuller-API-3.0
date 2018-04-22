@@ -1,10 +1,11 @@
 process.env.NODE_ENV = 'test';
 
-const { describe, it } = require('mocha');
+const { describe, it, afterEach } = require('mocha');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const moment = require('moment');
 const _ = require('lodash');
+const mongoose = require('mongoose');
 
 const { server } = require('../../server');
 const TestHelper = require('../TestHelper');
@@ -16,6 +17,10 @@ chai.use(chaiHttp);
 const should = chai.should();
 
 describe('[Controller] Booking', () => {
+  afterEach(done => {
+    mongoose.connection.db.dropDatabase(() => done());
+  });
+
   describe('GET /availableTime', () => {
     const username = 'username2';
     const password = 'password2';
@@ -145,18 +150,18 @@ describe('[Controller] Booking', () => {
                             .property('machineId')
                             .eql(machineId);
                           appointments[0].should.have.property('schedule');
-                          appointments[0].schedule.be.a('object');
-                          appointments[0].schedule.have
+                          appointments[0].schedule.should.be.a('object');
+                          appointments[0].schedule.should.have
                             .property('date')
                             .eql(today);
-                          appointments[0].schedule.have
+                          appointments[0].schedule.should.have
                             .property('time')
                             .eql(bookingTime);
+                          done();
                         }
                       );
                     }
                   );
-                  done();
                 });
             }
           );
