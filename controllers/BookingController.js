@@ -47,3 +47,23 @@ exports.CREATE_APPOINTMENT = (request, response, next) => {
     }
   );
 };
+
+exports.GET_APPOINTMENTS_BY_LOGIN_TOKEN = (request, response, next) => {
+  const {
+    headers: { authorization }
+  } = request;
+
+  BookingService.getAppointmentsByLoginToken(
+    authorization,
+    (clientError, error, appointments) => {
+      if (clientError || error) {
+        response.locals.statusCode = clientError ? UNAUTHORIZED : BAD_REQUEST;
+        response.locals.clientError = clientError;
+        response.locals.error = error;
+        next();
+      } else {
+        response.status(OK).json(appointments);
+      }
+    }
+  );
+};

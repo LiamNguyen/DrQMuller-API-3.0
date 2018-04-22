@@ -1,4 +1,4 @@
-const TokenValidator = require('../lib/validators/TokenValidator');
+const UUIDValidator = require('../lib/validators/UUIDValidator');
 const UserInfoValidator = require('../lib/validators/UserInfoValidator');
 const ErrorHelper = require('../lib/ErrorHelper');
 const UserRepository = require('../repositories/UserRepository');
@@ -6,7 +6,7 @@ const UserRepository = require('../repositories/UserRepository');
 const { getError } = ErrorHelper;
 
 exports.updateUserInfo = (token, info, callback) => {
-  if (!TokenValidator.validate(token)) {
+  if (!UUIDValidator.validate(token)) {
     return callback(getError(null, 'Token validation failed'));
   }
   if (!UserInfoValidator.validate(info)) {

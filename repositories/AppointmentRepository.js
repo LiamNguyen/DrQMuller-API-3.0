@@ -17,5 +17,5 @@ module.exports.create = (userId, machineId, schedule, callback) => {
 };
 
 module.exports.getByUserId = (userId, callback) => {
-  Appointment.find({ userId }, callback);
+  Appointment.find({ userId }, callback).sort({ createdAt: -1 });
 };

@@ -8,7 +8,7 @@ const LoginTokenRepository = require('../repositories/LoginTokenRepository');
 const TokenRepository = require('../repositories/TokenRepository');
 const CredentialsValidator = require('../lib/validators/CredentialsValidator');
 const ErrorHelper = require('../lib/ErrorHelper');
-const TokenValidator = require('../lib/validators/TokenValidator');
+const UUIDValidator = require('../lib/validators/UUIDValidator');
 const TokenType = require('../constants/TokenTypeConstants');
 const MailGun = require('../lib/MailGun');
 const RoutePathConstants = require('../constants/RoutePathConstants');
@@ -133,7 +133,7 @@ exports.signin = (username, password, callback) => {
 };
 
 exports.signout = (token, callback) => {
-  if (!TokenValidator.validate(token)) {
+  if (!UUIDValidator.validate(token)) {
     return callback(getError(null, 'Token validation failed'));
   }
   LoginTokenRepository.delete(token, callback);

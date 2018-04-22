@@ -6,7 +6,7 @@ const TimeHelper = require('../lib/TimeHelper');
 const ErrorHelper = require('../lib/ErrorHelper');
 const LoginTokenRepository = require('../repositories/LoginTokenRepository');
 const ApiError = require('../constants/ApiError');
-const TokenValidator = require('../lib/validators/TokenValidator');
+const UUIDValidator = require('../lib/validators/UUIDValidator');
 const DateValidator = require('../lib/validators/DateValidator');
 const NewAppointmentValidator = require('../lib/validators/NewAppointmentValidator');
 const AppointmentRepository = require('../repositories/AppointmentRepository');
@@ -55,7 +55,7 @@ function getAvailableList(machineId, date, startTime, endTime, callback) {
 
 exports.getAvailableTimes = (token, machineId, date, callback) => {
   // Validate input
-  if (!TokenValidator.validate(token)) {
+  if (!UUIDValidator.validate(token)) {
     return callback(null, getError(null, 'Token validation failed'));
   }
   if (!DateValidator.validate(date)) {
@@ -110,33 +110,75 @@ exports.createAppointment = (token, machineId, schedule, callback) => {
     if (!userId) {
       return callback(ApiError.unauthorized);
     }
-    MachineRepository.getById(machineId, (error, machines) => {
-      if (error) {
-        return callback(null, getError(error, 'Get machine by Id failed'));
+    MachineRepository.getById(machineId, (getMachineByIdError, machines) => {
+      if (getMachineByIdError) {
+        return callback(
+          null,
+          getError(getMachineByIdError, 'Get machine by Id failed')
+        );
       }
       if (_.isEmpty(machines)) {
         return callback(null, getError(null, 'Machine not found'));
       }
-      AppointmentRepository.create(userId, machineId, schedule, error => {
-        if (error) {
-          return callback(null, getError(error, 'Create appointment failed'));
-        }
-        MachineRepository.addSchedule(
-          machineId,
-          schedule,
-          (addScheduleError, result) => {
-            if (addScheduleError || result.n === 0) {
-              return callback(
-                null,
-                getError(addScheduleError, 'Add schedule failed')
-              );
-            }
-            // TODO: Release booking in temporary collection
-            // TODO: Send email to customer service
-            // TODO: Push notification via Socket.io to management portal
+      AppointmentRepository.create(
+        userId,
+        machineId,
+        schedule,
+        createAppointmentError => {
+          if (createAppointmentError) {
+            return callback(
+              null,
+              getError(createAppointmentError, 'Create appointment failed')
+            );
           }
-        );
-      });
+          MachineRepository.addSchedule(
+            machineId,
+            schedule,
+            (addScheduleError, result) => {
+              if (addScheduleError || result.n === 0) {
+                return callback(
+                  null,
+                  getError(addScheduleError, 'Add schedule failed')
+                );
+              }
+              // TODO: Release booking in temporary collection
+              // TODO: Send email to customer service
+              // TODO: Push notification via Socket.io to management portal
+              callback(null, null);
+            }
+          );
+        }
+      );
     });
+  });
+};
+
+exports.getAppointmentsByLoginToken = (token, callback) => {
+  // Validate input
+  if (!UUIDValidator.validate(token)) {
+    return callback(null, getError(null, 'LoginToken validation failed'));
+  }
+  LoginTokenRepository.getUserIdByToken(token, (error, userId) => {
+    if (error) {
+      return callback(null, getError(error, 'Get userId by token failed'));
+    }
+    if (!userId) {
+      return callback(ApiError.unauthorized);
+    }
+    AppointmentRepository.getByUserId(
+      userId,
+      (getAppointmentByUserIdError, appointments) => {
+        if (getAppointmentByUserIdError) {
+          return callback(
+            null,
+            getError(
+              getAppointmentByUserIdError,
+              'Get appointment by UserId failed'
+            )
+          );
+        }
+        callback(null, null, appointments);
+      }
+    );
   });
 };
