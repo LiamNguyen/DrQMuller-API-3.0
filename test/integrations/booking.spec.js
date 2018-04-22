@@ -6,6 +6,7 @@ const chaiHttp = require('chai-http');
 const moment = require('moment');
 const _ = require('lodash');
 const mongoose = require('mongoose');
+const uuidv4 = require('uuid/v4');
 
 const { server } = require('../../server');
 const TestHelper = require('../TestHelper');
@@ -92,6 +93,7 @@ describe('[Controller] Booking', () => {
     const password = 'password3';
     const today = moment().format('YYYY-MM-DD');
     const bookingTime = '12:50';
+    const schedule = { date: today, time: bookingTime };
 
     it('User should be able to create new appointment', done => {
       TestHelper.createMachineWithSchedule(
@@ -108,34 +110,7 @@ describe('[Controller] Booking', () => {
                 .set('authorization', loginToken)
                 .send({
                   machineId,
-                  schedule: { date: today, time: bookingTime }
-                })
-                .end((createAppointmentError, response) => {
-                  response.should.have.status(201);
-                  done();
-                });
-            }
-          );
-        }
-      );
-    });
-
-    it('Newly created appointment should be saved correctly', done => {
-      TestHelper.createMachineWithSchedule(
-        'Machine 1',
-        [{ date: today, time: '17:50' }],
-        machineId => {
-          TestHelper.signin(
-            username,
-            password,
-            (clientError, signinError, loginToken) => {
-              chai
-                .request(server)
-                .post('/appointment')
-                .set('authorization', loginToken)
-                .send({
-                  machineId,
-                  schedule: { date: today, time: bookingTime }
+                  schedule
                 })
                 .end((createAppointmentError, response) => {
                   response.should.have.status(201);
@@ -167,6 +142,108 @@ describe('[Controller] Booking', () => {
           );
         }
       );
+    });
+
+    // eslint-disable-next-line max-len
+    it("Newly created appointment's schedule should be added to machine's schedules ", done => {
+      TestHelper.createMachineWithSchedule(
+        'Machine 1',
+        [{ date: today, time: '17:50' }],
+        machineId => {
+          TestHelper.signin(
+            username,
+            password,
+            (clientError, signinError, loginToken) => {
+              chai
+                .request(server)
+                .post('/appointment')
+                .set('authorization', loginToken)
+                .send({
+                  machineId,
+                  schedule
+                })
+                .end((createAppointmentError, response) => {
+                  response.should.have.status(201);
+                  MachineRepository.getById(machineId, (error, machine) => {
+                    machine.should.be.a('object');
+                    machine.should.have.property('schedules');
+                    machine.schedules.length.should.be.eql(2);
+                    const newlyAddedSchedule = machine.schedules.find(
+                      s => s.time === schedule.time
+                    );
+                    should.not.equal(newlyAddedSchedule, null);
+                    newlyAddedSchedule.date.should.be.eql(today);
+                    done();
+                  });
+                });
+            }
+          );
+        }
+      );
+    });
+
+    // eslint-disable-next-line max-len
+    it('User should not be able to create new appointment if login token is invalid', done => {
+      TestHelper.createMachineWithSchedule(
+        'Machine 1',
+        [{ date: today, time: '17:50' }],
+        machineId => {
+          chai
+            .request(server)
+            .post('/appointment')
+            .set('authorization', uuidv4())
+            .send({
+              machineId,
+              schedule
+            })
+            .end((createAppointmentError, response) => {
+              response.should.have.status(401);
+              done();
+            });
+        }
+      );
+    });
+
+    // eslint-disable-next-line max-len
+    // TODO: User should not be able to create new appointment if machine ID is missing or invalid
+    // eslint-disable-next-line max-len
+    // TODO: User should not be able to create new appointment if schedule is missing or invalid
+  });
+
+  describe('GET /appointments', () => {
+    it('User should be able to get own appointments', done => {
+      TestHelper.createAppointmentForUser((loginToken, machineId, schedule) => {
+        chai
+          .request(server)
+          .get('/appointments')
+          .set('authorization', loginToken)
+          .send()
+          .end((getAppointmentsError, response) => {
+            response.should.have.status(200);
+            response.body.should.be.a('array');
+            response.body.length.should.eql(1);
+            response.body[0].should.have.property('machineId').eql(machineId);
+            response.body[0].should.have.property('schedule');
+            should.not.equal(response.body[0].schedule, null);
+            should.not.equal(response.body[0].schedule, undefined);
+            response.body[0].schedule.date.should.eql(schedule.date);
+            response.body[0].schedule.time.should.eql(schedule.time);
+            done();
+          });
+      });
+    });
+
+    // eslint-disable-next-line max-len
+    it('User should not be able to get own appointments if login token is invalid', done => {
+      chai
+        .request(server)
+        .get('/appointments')
+        .set('authorization', uuidv4())
+        .send()
+        .end((getAppointmentsError, response) => {
+          response.should.have.status(401);
+          done();
+        });
     });
   });
 });
