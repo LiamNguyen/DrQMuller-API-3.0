@@ -1,27 +1,24 @@
 process.env.NODE_ENV = 'test';
 
-const { describe, it, beforeEach } = require('mocha');
+const { describe, it } = require('mocha');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const mongoose = require('mongoose');
 const moment = require('moment');
 const _ = require('lodash');
 
 const { server } = require('../../server');
 const TestHelper = require('../TestHelper');
 const MachineRepository = require('../../repositories/MachineRepository');
+const AppointmentRepository = require('../../repositories/AppointmentRepository');
+const LoginTokenRepository = require('../../repositories/LoginTokenRepository');
 
 chai.use(chaiHttp);
 const should = chai.should();
 
 describe('[Controller] Booking', () => {
-  beforeEach(done => {
-    mongoose.connection.db.dropDatabase(() => done());
-  });
-
   describe('GET /availableTime', () => {
-    const username = 'username1';
-    const password = 'password1';
+    const username = 'username2';
+    const password = 'password2';
     const today = moment().format('YYYY-MM-DD');
 
     it('User should be able to get available time', done => {
@@ -83,5 +80,88 @@ describe('[Controller] Booking', () => {
     // TODO: User should not be able to get available time if machine Id cannot be found
     // TODO: User should not be able to get available time if with bad pattern token
     // TODO: User should not be able to get available time if with bad pattern machine Id
+  });
+
+  describe('POST /appointment', () => {
+    const username = 'username3';
+    const password = 'password3';
+    const today = moment().format('YYYY-MM-DD');
+    const bookingTime = '12:50';
+
+    it('User should be able to create new appointment', done => {
+      TestHelper.createMachineWithSchedule(
+        'Machine 1',
+        [{ date: today, time: '17:50' }],
+        machineId => {
+          TestHelper.signin(
+            username,
+            password,
+            (clientError, signinError, loginToken) => {
+              chai
+                .request(server)
+                .post('/appointment')
+                .set('authorization', loginToken)
+                .send({
+                  machineId,
+                  schedule: { date: today, time: bookingTime }
+                })
+                .end((createAppointmentError, response) => {
+                  response.should.have.status(201);
+                  done();
+                });
+            }
+          );
+        }
+      );
+    });
+
+    it('Newly created appointment should be saved correctly', done => {
+      TestHelper.createMachineWithSchedule(
+        'Machine 1',
+        [{ date: today, time: '17:50' }],
+        machineId => {
+          TestHelper.signin(
+            username,
+            password,
+            (clientError, signinError, loginToken) => {
+              chai
+                .request(server)
+                .post('/appointment')
+                .set('authorization', loginToken)
+                .send({
+                  machineId,
+                  schedule: { date: today, time: bookingTime }
+                })
+                .end((createAppointmentError, response) => {
+                  response.should.have.status(201);
+                  LoginTokenRepository.getUserIdByToken(
+                    loginToken,
+                    (getUserIdByTokenError, userId) => {
+                      AppointmentRepository.getByUserId(
+                        userId,
+                        (error, appointments) => {
+                          appointments.length.should.eql(1);
+                          appointments[0].should.have
+                            .property('machineId')
+                            .eql(machineId);
+                          appointments[0].should.have.property('schedule');
+                          appointments[0].schedule.be.a('object');
+                          appointments[0].schedule.have
+                            .property('date')
+                            .eql(today);
+                          appointments[0].schedule.have
+                            .property('time')
+                            .eql(bookingTime);
+                        }
+                      );
+                    }
+                  );
+                  done();
+                });
+            }
+          );
+        }
+      );
+    });
   });
 });
