@@ -246,4 +246,51 @@ describe('[Controller] Booking', () => {
         });
     });
   });
+
+  describe('GET /machines', () => {
+    it('User should be able to get all machines', done => {
+      TestHelper.signin(
+        'username1',
+        'password1',
+        (clientError, signinError, loginToken) => {
+          TestHelper.createMachine('Machine 1', () => {
+            TestHelper.createMachine('Machine 2', () => {
+              chai
+                .request(server)
+                .get('/machines')
+                .set('authorization', loginToken)
+                .send()
+                .end((getMachinesError, response) => {
+                  response.should.have.status(200);
+                  response.body.should.be.a('array');
+                  response.body.length.should.eql(2);
+                  response.body[0].should.have.property('id');
+                  response.body[0].id.should.be.a('string');
+                  response.body[0].should.have.property('name');
+                  response.body[0].name.should.be.eql('Machine 1');
+                  response.body[1].should.have.property('id');
+                  response.body[1].id.should.be.a('string');
+                  response.body[1].should.have.property('name');
+                  response.body[1].name.should.be.eql('Machine 2');
+                  done();
+                });
+            });
+          });
+        }
+      );
+    });
+
+    // eslint-disable-next-line max-len
+    it('User should not be able to get all machines if login token is invalid', done => {
+      chai
+        .request(server)
+        .get('/machines')
+        .set('authorization', uuidv4())
+        .send()
+        .end((getMachinesError, response) => {
+          response.should.have.status(401);
+          done();
+        });
+    });
+  });
 });

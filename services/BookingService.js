@@ -182,3 +182,27 @@ exports.getAppointmentsByLoginToken = (token, callback) => {
     );
   });
 };
+
+exports.getAllMachines = (token, callback) => {
+  // Validate input
+  if (!UUIDValidator.validate(token)) {
+    return callback(null, getError(null, 'LoginToken validation failed'));
+  }
+  LoginTokenRepository.getUserIdByToken(token, (error, userId) => {
+    if (error) {
+      return callback(null, getError(error, 'Get userId by token failed'));
+    }
+    if (!userId) {
+      return callback(ApiError.unauthorized);
+    }
+    MachineRepository.getAllMachines((getMachinesError, machines) => {
+      if (getMachinesError) {
+        return callback(
+          null,
+          getError(getMachinesError, 'Get all machines failed')
+        );
+      }
+      callback(null, null, machines);
+    });
+  });
+};

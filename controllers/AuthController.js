@@ -49,7 +49,7 @@ exports.POST_SIGNOUT = (request, response, next) => {
       response.locals.clientError = {};
       next();
     } else {
-      response.status(OK).send();
+      response.status(OK).send({});
     }
   });
 };

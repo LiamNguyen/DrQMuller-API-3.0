@@ -101,10 +101,15 @@ function createAppointmentForUser(callback) {
   );
 }
 
+function createMachine(name, callback) {
+  MachineRepository.create(name, callback);
+}
+
 module.exports = {
   signin,
   createUser,
   createMachineWithSchedule,
   mockAvailableTime,
-  createAppointmentForUser
+  createAppointmentForUser,
+  createMachine
 };

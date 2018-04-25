@@ -29,6 +29,10 @@ module.exports.addSchedule = (id, schedule, callback) => {
   });
 };
 
+module.exports.getAllMachines = callback => {
+  Machine.find({}, { id: 1, name: 1, _id: 0 }, callback).sort({ name: 1 });
+};
+
 // Integration test purpose only
 module.exports.overwriteSchedules = (id, schedules, callback) => {
   if (process.env.NODE_ENV !== 'test') return;

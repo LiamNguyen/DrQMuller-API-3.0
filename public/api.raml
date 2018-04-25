@@ -153,6 +153,39 @@ types:
             example: |
              {}
 
+/machines:
+  securedBy: x-token
+  get:
+    description: Get all machines
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              [
+                {
+                    "id": "F0FFDCA9-5674-4D58-913E-DABDEF83DF55",
+                    "name": "Dr. Müller Beauty Light Therapy"
+                },
+                {
+                    "id": "C42F0761-DF21-4DD6-BBC2-1FB698A0660B",
+                    "name": "Dr. Müller Changing Cubicle"
+                }
+              ]
+      400:
+        body:
+          application/json:
+            example: |
+             {
+               "error_message": "There was a server error",
+               "error_code": "server_error"
+             }
+      401:
+        body:
+          application/json:
+            example: |
+             {}
+
 /signin:
   post:
     description: User signin

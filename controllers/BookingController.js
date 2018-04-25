@@ -67,3 +67,23 @@ exports.GET_APPOINTMENTS_BY_LOGIN_TOKEN = (request, response, next) => {
     }
   );
 };
+
+exports.GET_ALL_MACHINES = (request, response, next) => {
+  const {
+    headers: { authorization }
+  } = request;
+
+  BookingService.getAllMachines(
+    authorization,
+    (clientError, error, machines) => {
+      if (clientError || error) {
+        response.locals.statusCode = clientError ? UNAUTHORIZED : BAD_REQUEST;
+        response.locals.clientError = clientError;
+        response.locals.error = error;
+        next();
+      } else {
+        response.status(OK).json(machines);
+      }
+    }
+  );
+};
