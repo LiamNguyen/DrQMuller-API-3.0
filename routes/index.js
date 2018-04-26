@@ -26,8 +26,13 @@ module.exports = app => {
         statusCode
       );
     }
-    response
-      .status(statusCode || BAD_REQUEST)
-      .send(clientError || ApiError.server_error);
+
+    if (request.url === '/') {
+      response.redirect('/docs');
+    } else {
+      response
+        .status(statusCode || BAD_REQUEST)
+        .send(clientError || ApiError.server_error);
+    }
   });
 };
