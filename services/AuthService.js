@@ -8,7 +8,7 @@ const LoginTokenRepository = require('../repositories/LoginTokenRepository');
 const TokenRepository = require('../repositories/TokenRepository');
 const CredentialsValidator = require('../lib/validators/CredentialsValidator');
 const ErrorHelper = require('../lib/ErrorHelper');
-const TokenValidator = require('../lib/validators/TokenValidator');
+const UUIDValidator = require('../lib/validators/UUIDValidator');
 const TokenType = require('../constants/TokenTypeConstants');
 const MailGun = require('../lib/MailGun');
 const RoutePathConstants = require('../constants/RoutePathConstants');
@@ -24,26 +24,24 @@ function encryptPassword(password, callback) {
       return callback(genSaltError);
     }
 
-    bcrypt.hash(password, salt, (hashError, hash) =>
-      callback(hashError, hash));
+    bcrypt.hash(password, salt, (hashError, hash) => callback(hashError, hash));
   });
 }
 
 function comparePassword(password, hash, callback) {
-  bcrypt.compare(password, hash, (error, match) => (
-    error == null
-      ? callback(null, match)
-      : callback(error)
-  ));
+  bcrypt.compare(
+    password,
+    hash,
+    (error, match) => (error == null ? callback(null, match) : callback(error))
+  );
 }
 
 function usernameExist(username, callback) {
   UserRepository.getUserByUsername(username, (getUserError, user) => {
     if (getUserError) {
-      return callback(getError(
-        getUserError,
-        'Failed when query user from database'
-      ));
+      return callback(
+        getError(getUserError, 'Failed when query user from database')
+      );
     }
     return callback(null, user !== null);
   });
@@ -65,20 +63,26 @@ exports.createUser = (username, password, callback) => {
     }
     encryptPassword(password, (encryptPasswordError, hash) => {
       if (encryptPasswordError) {
-        return callback(null, getError(encryptPasswordError, 'Password hash error'));
+        return callback(
+          null,
+          getError(encryptPasswordError, 'Password hash error')
+        );
       }
       UserRepository.createNewUser(username, hash, (createUserError, user) => {
         if (createUserError) {
-          return callback(null, getError(createUserError, 'Create new user error'));
+          return callback(
+            null,
+            getError(createUserError, 'Create new user error')
+          );
         }
         LoginTokenRepository.create(
           user.id,
           (createLoginTokenError, tokenDto) => {
             if (createLoginTokenError) {
-              return callback(null, getError(
-                createLoginTokenError,
-                'Create login token error'
-              ));
+              return callback(
+                null,
+                getError(createLoginTokenError, 'Create login token error')
+              );
             }
             callback(null, null, tokenDto.id);
           }
@@ -95,10 +99,10 @@ exports.signin = (username, password, callback) => {
   }
   UserRepository.getUserByUsername(username, (getUserError, user) => {
     if (getUserError) {
-      return callback(null, getError(
-        getUserError,
-        'Failed when query user from database'
-      ));
+      return callback(
+        null,
+        getError(getUserError, 'Failed when query user from database')
+      );
     }
     if (user) {
       comparePassword(password, user.password, (error, match) => {
@@ -106,15 +110,18 @@ exports.signin = (username, password, callback) => {
           return callback(null, getError(error, 'Compare password failed'));
         }
         if (match) {
-          LoginTokenRepository.create(user.id, (createLoginTokenError, tokenDto) => {
-            if (createLoginTokenError) {
-              return callback(null, getError(
-                createLoginTokenError,
-                'Create login token error'
-              ));
+          LoginTokenRepository.create(
+            user.id,
+            (createLoginTokenError, tokenDto) => {
+              if (createLoginTokenError) {
+                return callback(
+                  null,
+                  getError(createLoginTokenError, 'Create login token error')
+                );
+              }
+              callback(null, null, tokenDto.id);
             }
-            callback(null, null, tokenDto.id);
-          });
+          );
         } else {
           callback(ApiError.invalid_username_or_password);
         }
@@ -126,7 +133,7 @@ exports.signin = (username, password, callback) => {
 };
 
 exports.signout = (token, callback) => {
-  if (!TokenValidator.validate(token)) {
+  if (!UUIDValidator.validate(token)) {
     return callback(getError(null, 'Token validation failed'));
   }
   LoginTokenRepository.delete(token, callback);
@@ -150,13 +157,17 @@ exports.resetPasswordRequest = (email, callback) => {
     TokenRepository.create(
       userIdList,
       TokenType.resetPassword,
-      moment().add(5, 'h').format(),
+      moment()
+        .add(5, 'h')
+        .format(),
       (createTokenError, tokenDto) => {
         if (createTokenError) {
-          return callback(getError(
-            createTokenError,
-            `Create reset password token failed for user: ${userIdList}`
-          ));
+          return callback(
+            getError(
+              createTokenError,
+              `Create reset password token failed for user: ${userIdList}`
+            )
+          );
         }
         MailGun.send(
           email,
@@ -165,10 +176,12 @@ exports.resetPasswordRequest = (email, callback) => {
           { resetPasswordLink: tokenDto.id },
           sendMailError => {
             if (sendMailError) {
-              return callback(getError(
-                sendMailError,
-                `Send reset password email failed for address: ${email}`
-              ));
+              return callback(
+                getError(
+                  sendMailError,
+                  `Send reset password email failed for address: ${email}`
+                )
+              );
             }
             callback(null);
           }
@@ -181,11 +194,17 @@ exports.resetPasswordRequest = (email, callback) => {
 exports.resetPasswordConfirm = (token, password, callback) => {
   // Validate input
   if (!TokenPasswordValidator.validate(token, password)) {
-    return callback(null, getError(null, 'Token or password validation failed'));
+    return callback(
+      null,
+      getError(null, 'Token or password validation failed')
+    );
   }
   TokenRepository.getTokenValidity(token, (getTokenValidityError, valid) => {
     if (getTokenValidityError) {
-      return callback(null, getError(getTokenValidityError, 'Get token validity failed'));
+      return callback(
+        null,
+        getError(getTokenValidityError, 'Get token validity failed')
+      );
     }
     if (!valid) {
       return callback(ApiError.token_expired);
@@ -196,14 +215,20 @@ exports.resetPasswordConfirm = (token, password, callback) => {
       }
       encryptPassword(password, (encryptPasswordError, hash) => {
         if (encryptPasswordError) {
-          return callback(null, getError(encryptPasswordError, 'Password hash error'));
+          return callback(
+            null,
+            getError(encryptPasswordError, 'Password hash error')
+          );
         }
         UserRepository.updatePasswordForUsers(
           userIdList,
           hash,
           (updatePwdError, updateResult) => {
             if (updatePwdError) {
-              return callback(null, getError(updatePwdError, 'Reset password failed'));
+              return callback(
+                null,
+                getError(updatePwdError, 'Reset password failed')
+              );
             }
             if (!updateResult || updateResult.n === 0) {
               return callback(
@@ -211,21 +236,27 @@ exports.resetPasswordConfirm = (token, password, callback) => {
                 getError(null, `Reset password failed for token ${token}`)
               );
             }
-            TokenRepository.markTokenAsUsed(token, (markedTokenAsUsedError, result) => {
-              if (markedTokenAsUsedError) {
-                return callback(
-                  null,
-                  getError(markedTokenAsUsedError, 'Mark token as used failed')
-                );
+            TokenRepository.markTokenAsUsed(
+              token,
+              (markedTokenAsUsedError, result) => {
+                if (markedTokenAsUsedError) {
+                  return callback(
+                    null,
+                    getError(
+                      markedTokenAsUsedError,
+                      'Mark token as used failed'
+                    )
+                  );
+                }
+                if (!result || result.n === 0) {
+                  return callback(
+                    null,
+                    getError(null, `Mark token as used failed for ${token}`)
+                  );
+                }
+                callback(null, null);
               }
-              if (!result || result.n === 0) {
-                return callback(
-                  null,
-                  getError(null, `Mark token as used failed for ${token}`)
-                );
-              }
-              callback(null, null);
-            });
+            );
           }
         );
       });

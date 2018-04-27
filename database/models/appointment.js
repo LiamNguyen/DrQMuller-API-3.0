@@ -1,24 +1,21 @@
 const mongoose = require('mongoose');
 
-const tokenSchema = mongoose.Schema({
+const appointmentSchema = mongoose.Schema({
   id: {
     type: String,
     required: true
   },
-  userIdList: {
-    type: Array,
-    required: true
-  },
-  type: {
+  userId: {
     type: String,
     required: true
   },
-  validUntil: {
-    type: Date,
-    require: true
+  machineId: {
+    type: String,
+    required: true
   },
-  usedAt: {
-    type: Date
+  schedule: {
+    type: Object,
+    required: true
   },
   updatedAt: {
     type: Date,
@@ -31,8 +28,12 @@ const tokenSchema = mongoose.Schema({
 });
 
 // eslint-disable-next-line func-names
-tokenSchema.pre('update', function() {
+appointmentSchema.pre('update', function() {
   this.update({}, { $set: { updatedAt: new Date() } });
 });
 
-module.exports = mongoose.model('Token', tokenSchema, 'Token');
+module.exports = mongoose.model(
+  'Appointment',
+  appointmentSchema,
+  'Appointment'
+);

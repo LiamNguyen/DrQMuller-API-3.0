@@ -3,18 +3,17 @@ const uuidv1 = require('uuid/v1');
 const User = require('../database/models/user');
 const LoginTokenRepository = require('./LoginTokenRepository');
 
-module.exports.createNewUser = (
-  username,
-  password,
-  callback
-) => {
+module.exports.createNewUser = (username, password, callback) => {
   const id = uuidv1();
 
-  User.create({
-    id,
-    username,
-    password
-  }, callback);
+  User.create(
+    {
+      id,
+      username,
+      password
+    },
+    callback
+  );
 };
 
 module.exports.getUserByUsername = (username, callback) => {
@@ -40,5 +39,10 @@ module.exports.updateUserInfo = (token, info, callback) => {
 };
 
 module.exports.updatePasswordForUsers = (userIdList, password, callback) => {
-  User.update({ id: { $in: userIdList } }, { password }, { multi: true }, callback);
+  User.update(
+    { id: { $in: userIdList } },
+    { password },
+    { multi: true },
+    callback
+  );
 };

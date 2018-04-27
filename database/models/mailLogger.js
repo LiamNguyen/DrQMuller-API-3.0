@@ -26,8 +26,4 @@ const mailLoggerSchema = mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model(
-  'MailLogger',
-  mailLoggerSchema,
-  'MailLogger'
-);
+module.exports = mongoose.model('MailLogger', mailLoggerSchema, 'MailLogger');

@@ -15,8 +15,4 @@ const loginTokenSchema = mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model(
-  'LoginToken',
-  loginTokenSchema,
-  'LoginToken'
-);
+module.exports = mongoose.model('LoginToken', loginTokenSchema, 'LoginToken');

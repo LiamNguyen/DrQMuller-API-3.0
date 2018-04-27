@@ -2,12 +2,7 @@ const uuidv1 = require('uuid/v1');
 
 const EventLogger = require('../database/models/eventLogger');
 
-module.exports.create = (
-  logType,
-  request,
-  response,
-  statusCode
-) => {
+module.exports.create = (logType, request, response, statusCode) => {
   const id = uuidv1();
 
   EventLogger.create({

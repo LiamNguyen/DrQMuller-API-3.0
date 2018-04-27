@@ -5,10 +5,13 @@ const Machine = require('../database/models/machine');
 module.exports.create = (name, callback) => {
   const id = uuidv1();
 
-  Machine.create({
-    id,
-    name
-  }, callback);
+  Machine.create(
+    {
+      id,
+      name
+    },
+    callback
+  );
 };
 
 module.exports.getById = (id, callback) => {
@@ -26,8 +29,13 @@ module.exports.addSchedule = (id, schedule, callback) => {
   });
 };
 
+module.exports.getAllMachines = callback => {
+  Machine.find({}, { id: 1, name: 1, _id: 0 }, callback).sort({ name: 1 });
+};
+
 // Integration test purpose only
 module.exports.overwriteSchedules = (id, schedules, callback) => {
+  if (process.env.NODE_ENV !== 'test') return;
   Machine.findOne({ id }, error => {
     if (error) {
       return callback(error);

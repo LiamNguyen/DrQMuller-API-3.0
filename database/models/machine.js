@@ -26,12 +26,8 @@ const machineSchema = mongoose.Schema({
 });
 
 // eslint-disable-next-line func-names
-machineSchema.pre('update', function () {
+machineSchema.pre('update', function() {
   this.update({}, { $set: { updatedAt: new Date() } });
 });
 
-module.exports = mongoose.model(
-  'Machine',
-  machineSchema,
-  'Machine'
-);
+module.exports = mongoose.model('Machine', machineSchema, 'Machine');

@@ -1,6 +1,6 @@
 process.env.NODE_ENV = 'test';
 
-const { describe, it, beforeEach } = require('mocha');
+const { describe, it, afterEach } = require('mocha');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
@@ -18,7 +18,7 @@ chai.use(chaiHttp);
 const should = chai.should();
 
 describe('[Controller] Authentication', () => {
-  beforeEach(done => {
+  afterEach(done => {
     mongoose.connection.db.dropDatabase(() => done());
   });
 
@@ -29,29 +29,35 @@ describe('[Controller] Authentication', () => {
 
     it('User should be able to sign in', done => {
       AuthService.createUser(username, password, () => {
-        chai.request(server)
+        chai
+          .request(server)
           .post('/signin')
           .send({ username, password })
           .end((error, response) => {
             response.should.have.status(200);
             response.body.should.be.a('object');
             response.body.should.have.property('loginToken');
-            LoginToken.findOne({ id: response.body.loginToken }, (e, result) => {
-              result.should.not.eql(null);
-            });
-            done();
+            LoginToken.findOne(
+              { id: response.body.loginToken },
+              (e, result) => {
+                result.should.not.eql(null);
+                done();
+              }
+            );
           });
       });
     });
 
     it('User should not be able to sign in using invalid username or password', done => {
-      chai.request(server)
+      chai
+        .request(server)
         .post('/signin')
         .send({ invalidUsername, password })
         .end((error, response) => {
           response.should.have.status(400);
           response.body.should.be.a('object');
-          response.body.should.have.property('error_code')
+          response.body.should.have
+            .property('error_code')
             .eql(ApiError.invalid_username_or_password.error_code);
           done();
         });
@@ -63,7 +69,8 @@ describe('[Controller] Authentication', () => {
       const username = 'username1';
       const password = 'password1';
 
-      chai.request(server)
+      chai
+        .request(server)
         .post('/user')
         .send({ username, password })
         .end((error, response) => {
@@ -74,12 +81,12 @@ describe('[Controller] Authentication', () => {
             { id: response.body.loginToken },
             (loginTokenError, result) => {
               result.should.not.eql(null);
+              User.find({}, (userError, result) => {
+                result.length.should.eql(1);
+                done();
+              });
             }
           );
-          User.find({}, (userError, result) => {
-            result.length.should.eql(1);
-          });
-          done();
         });
     });
 
@@ -88,62 +95,72 @@ describe('[Controller] Authentication', () => {
       const password = 'password1';
 
       AuthService.createUser(username, password, () => {
-        chai.request(server)
+        chai
+          .request(server)
           .post('/user')
           .send({ username, password })
           .end((error, response) => {
             response.should.have.status(400);
             response.body.should.be.a('object');
-            response.body.should.have.property('error_code')
+            response.body.should.have
+              .property('error_code')
               .eql(ApiError.username_exist.error_code);
             done();
           });
       });
     });
 
-    it(
-      // eslint-disable-next-line
-      'User should not be able to sign up using username or password which fails validation',
-      done => {
-        const username = 'use$$@#$&&';
-        const password = 'pas';
+    it(// eslint-disable-next-line
+    'User should not be able to sign up using username or password which fails validation', done => {
+      const username = 'use$$@#$&&';
+      const password = 'pas';
 
-        chai.request(server)
-          .post('/user')
-          .send({ username, password })
-          .end((error, response) => {
-            response.should.have.status(400);
-            response.body.should.be.a('object');
-            response.body.should.have.property('error_code')
-              .eql(ApiError.server_error.error_code);
-            done();
-          });
-      }
-    );
+      chai
+        .request(server)
+        .post('/user')
+        .send({ username, password })
+        .end((error, response) => {
+          response.should.have.status(400);
+          response.body.should.be.a('object');
+          response.body.should.have
+            .property('error_code')
+            .eql(ApiError.server_error.error_code);
+          done();
+        });
+    });
   });
 
   describe('POST /signout', () => {
     it('User should be able to sign out', done => {
-      TestHelper.signin('username1', 'password1', (clientError, error, loginToken) => {
-        chai.request(server)
-          .post('/signout')
-          .set('authorization', loginToken)
-          .send()
-          .end((signoutError, response) => {
-            response.should.have.status(200);
-            response.body.should.be.a('object').eql({});
-            LoginToken.findOne({ id: response.body.loginToken }, (e, result) => {
-              result.should.be.eql(null);
+      TestHelper.signin(
+        'username1',
+        'password1',
+        (clientError, error, loginToken) => {
+          chai
+            .request(server)
+            .post('/signout')
+            .set('authorization', loginToken)
+            .send()
+            .end((signoutError, response) => {
+              response.should.have.status(200);
+              response.body.should.be.a('object').eql({});
+              LoginToken.findOne(
+                { id: response.body.loginToken },
+                (e, result) => {
+                  should.equal(result, null);
+                  done();
+                }
+              );
             });
-            done();
-          });
-      });
+        }
+      );
     });
 
     it('User should not be able to sign out when login token does not exist', done => {
       const randomToken = uuidv1();
 
-      chai.request(server)
+      chai
+        .request(server)
         .post('/signout')
         .set('authorization', randomToken)
         .send()
@@ -157,11 +174,12 @@ describe('[Controller] Authentication', () => {
 
   describe('POST /resetPasswordRequest', () => {
     it('User should be able to send reset password request', done => {
-      const email = 'thienphuc1996.nguyen@gmail.com';
+      const email = 'christranhaha@gmail.com';
       const username = 'username1';
 
       TestHelper.createUser(username, 'password1', { email }, (error, user) => {
-        chai.request(server)
+        chai
+          .request(server)
           .post('/resetPasswordRequest')
           .send({ email })
           .end((resetPasswordError, response) => {
@@ -171,43 +189,42 @@ describe('[Controller] Authentication', () => {
               should.not.equal(result, undefined);
               result.length.should.eql(1);
               result[0].userIdList[0].should.eql(user.id);
+              done();
             });
-            done();
           });
       });
     });
 
-    it(
-      'User should receive success message even though the email could not be found',
-      done => {
-        chai.request(server)
-          .post('/resetPasswordRequest')
-          .send({ email: 'some.random@email.com' })
-          .end((error, response) => {
-            response.should.have.status(200);
-            response.body.should.be.a('object').eql({});
-            Token.find({}, (e, result) => {
-              should.not.equal(result, null);
-              result.length.should.eql(0);
-            });
+    // eslint-disable-next-line max-len
+    it('User should receive success message even though the email could not be found', done => {
+      chai
+        .request(server)
+        .post('/resetPasswordRequest')
+        .send({ email: 'some.random@email.com' })
+        .end((error, response) => {
+          response.should.have.status(200);
+          response.body.should.be.a('object').eql({});
+          Token.find({}, (e, result) => {
+            should.not.equal(result, null);
+            result.length.should.eql(0);
             done();
           });
-      }
-    );
+        });
+    });
 
-    it(
-      'User should not be able to send reset password request if [Email] is invalid',
-      done => {
-        chai.request(server)
-          .post('/resetPasswordRequest')
-          .send({ email: 'invalid-email' })
-          .end((error, response) => {
-            response.should.have.status(400);
-            response.body.should.have.property('error_code')
-              .eql(ApiError.server_error.error_code);
-            done();
-          });
-      }
-    );
+    // eslint-disable-next-line max-len
+    it('User should not be able to send reset password request if [Email] is invalid', done => {
+      chai
+        .request(server)
+        .post('/resetPasswordRequest')
+        .send({ email: 'invalid-email' })
+        .end((error, response) => {
+          response.should.have.status(400);
+          response.body.should.have
+            .property('error_code')
+            .eql(ApiError.server_error.error_code);
+          done();
+        });
+    });
   });
 });
