@@ -25,11 +25,11 @@ function getAvailableList(machineId, date, startTime, endTime, callback) {
   const result = [];
   let time = startTime;
 
-  MachineRepository.getById(machineId, (error, machines) => {
+  MachineRepository.getById(machineId, (error, machine) => {
     if (error) {
       return callback(getError(error, 'Get machine by Id failed'));
     }
-    if (_.isEmpty(machines)) {
+    if (_.isEmpty(machine)) {
       return callback(getError(null, 'Machine not found'));
     }
     while (
@@ -38,7 +38,7 @@ function getAvailableList(machineId, date, startTime, endTime, callback) {
       !result[result.length - 1] ||
       isTimeAfter(endTime, result[result.length - 1])
     ) {
-      const { schedules } = machines;
+      const { schedules } = machine;
       const bookedTime = schedules
         .filter(schedule => schedule.date === date)
         .map(schedule => schedule.time);

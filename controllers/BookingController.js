@@ -42,7 +42,7 @@ exports.CREATE_APPOINTMENT = (request, response, next) => {
         response.locals.error = error;
         next();
       } else {
-        response.status(CREATED).send();
+        response.status(CREATED).send({});
       }
     }
   );
