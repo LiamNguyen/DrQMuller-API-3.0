@@ -17,6 +17,10 @@ const appointmentSchema = mongoose.Schema({
     type: Object,
     required: true
   },
+  isConfirmed: {
+    type: Boolean,
+    default: false
+  },
   updatedAt: {
     type: Date,
     default: Date.now

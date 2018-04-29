@@ -177,7 +177,24 @@ exports.getAppointmentsByLoginToken = (token, callback) => {
             )
           );
         }
-        callback(null, null, appointments);
+        MachineRepository.getAllMachines((getMachinesError, machines) => {
+          if (getMachinesError) {
+            return callback(
+              null,
+              getError(getMachinesError, 'Get all machines failed')
+            );
+          }
+          const processedAppointments = appointments.map(appointment => {
+            const { machineId } = appointment;
+            const { name: machineName } = machines.find(
+              machine => machine.id === machineId
+            );
+
+            // eslint-disable-next-line no-underscore-dangle
+            return { ...appointment._doc, machineName };
+          });
+          callback(null, null, processedAppointments);
+        });
       }
     );
   });
