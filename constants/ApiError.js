@@ -18,5 +18,9 @@ module.exports = {
   unauthorized: {
     error_message: 'Unauthorized',
     error_code: 'unauthorized'
+  },
+  date_time_not_available: {
+    error_message: 'Date or time is not available',
+    error_code: 'date_time_not_available'
   }
 };

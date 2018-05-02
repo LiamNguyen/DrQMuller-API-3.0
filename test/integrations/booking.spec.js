@@ -205,6 +205,45 @@ describe('[Controller] Booking', () => {
     });
 
     // eslint-disable-next-line max-len
+    it('User should not be able to create new appointment if the date or time is already being booked', done => {
+      TestHelper.createMachineWithSchedule(
+        'Machine 1',
+        [{ date: today, time: '17:50' }],
+        machineId => {
+          TestHelper.signin(
+            username,
+            password,
+            (clientError, signinError, loginToken) => {
+              chai
+                .request(server)
+                .post('/appointment')
+                .set('authorization', loginToken)
+                .send({
+                  machineId,
+                  schedule
+                })
+                .end((error, response) => {
+                  response.should.have.status(201);
+                  chai
+                    .request(server)
+                    .post('/appointment')
+                    .set('authorization', loginToken)
+                    .send({
+                      machineId,
+                      schedule
+                    })
+                    .end((createAppointmentError, response) => {
+                      response.should.have.status(400);
+                      done();
+                    });
+                });
+            }
+          );
+        }
+      );
+    });
+
+    // eslint-disable-next-line max-len
     // TODO: User should not be able to create new appointment if machine ID is missing or invalid
     // eslint-disable-next-line max-len
     // TODO: User should not be able to create new appointment if schedule is missing or invalid

@@ -10,6 +10,7 @@ const UUIDValidator = require('../lib/validators/UUIDValidator');
 const DateValidator = require('../lib/validators/DateValidator');
 const NewAppointmentValidator = require('../lib/validators/NewAppointmentValidator');
 const AppointmentRepository = require('../repositories/AppointmentRepository');
+const BookingHelper = require('../lib/BookingHelper');
 
 const {
   morningShiftStartTime,
@@ -110,15 +111,18 @@ exports.createAppointment = (token, machineId, schedule, callback) => {
     if (!userId) {
       return callback(ApiError.unauthorized);
     }
-    MachineRepository.getById(machineId, (getMachineByIdError, machines) => {
+    MachineRepository.getById(machineId, (getMachineByIdError, machine) => {
       if (getMachineByIdError) {
         return callback(
           null,
           getError(getMachineByIdError, 'Get machine by Id failed')
         );
       }
-      if (_.isEmpty(machines)) {
+      if (_.isEmpty(machine)) {
         return callback(null, getError(null, 'Machine not found'));
+      }
+      if (!BookingHelper.checkAvailability(machine.schedules, schedule)) {
+        return callback(ApiError.date_time_not_available);
       }
       AppointmentRepository.create(
         userId,

@@ -1,6 +1,7 @@
 const { OK, BAD_REQUEST, UNAUTHORIZED, CREATED } = require('http-status-codes');
 
 const BookingService = require('../services/BookingService');
+const ApiError = require('../constants/ApiError');
 
 exports.GET_AVAILABLE_TIME = (request, response, next) => {
   const {
@@ -37,7 +38,11 @@ exports.CREATE_APPOINTMENT = (request, response, next) => {
     schedule,
     (clientError, error) => {
       if (clientError || error) {
-        response.locals.statusCode = clientError ? UNAUTHORIZED : BAD_REQUEST;
+        response.locals.statusCode =
+          clientError &&
+          clientError.error_code === ApiError.unauthorized.error_code
+            ? UNAUTHORIZED
+            : BAD_REQUEST;
         response.locals.clientError = clientError;
         response.locals.error = error;
         next();
