@@ -21,6 +21,9 @@ const appointmentSchema = mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isCancelled: {
+    type: Boolean
+  },
   updatedAt: {
     type: Date,
     default: Date.now

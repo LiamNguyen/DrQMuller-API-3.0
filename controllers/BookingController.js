@@ -53,6 +53,28 @@ exports.CREATE_APPOINTMENT = (request, response, next) => {
   );
 };
 
+exports.CANCEL_APPOINTMENT = (request, response, next) => {
+  const {
+    body: { appointmentId },
+    headers: { authorization }
+  } = request;
+
+  BookingService.cancelAppointment(
+    authorization,
+    appointmentId,
+    (clientError, error) => {
+      if (clientError || error) {
+        response.locals.statusCode = clientError ? UNAUTHORIZED : BAD_REQUEST;
+        response.locals.clientError = clientError;
+        response.locals.error = error;
+        next();
+      } else {
+        response.status(OK).send({});
+      }
+    }
+  );
+};
+
 exports.GET_APPOINTMENTS_BY_LOGIN_TOKEN = (request, response, next) => {
   const {
     headers: { authorization }

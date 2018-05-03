@@ -22,3 +22,11 @@ module.exports.getByUserId = (userId, callback) => {
     'schedule.time': 1
   });
 };
+
+module.exports.cancelAppointment = (id, userId, callback) => {
+  Appointment.update({ id, userId }, { $set: { isCancelled: true } }, callback);
+};
+
+module.exports.getById = (id, callback) => {
+  Appointment.findOne({ id }, callback);
+};

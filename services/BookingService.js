@@ -227,3 +227,58 @@ exports.getAllMachines = (token, callback) => {
     });
   });
 };
+
+exports.cancelAppointment = (token, appointmentId, callback) => {
+  // Validate input
+  if (!UUIDValidator.validate(token)) {
+    return callback(null, getError(null, 'Token validation failed'));
+  }
+  if (!UUIDValidator.validate(appointmentId)) {
+    return callback(null, getError(null, 'AppointmentId validation failed'));
+  }
+  LoginTokenRepository.getUserIdByToken(token, (error, userId) => {
+    if (error) {
+      return callback(null, getError(error, 'Get userId by token failed'));
+    }
+    if (!userId) {
+      return callback(ApiError.unauthorized);
+    }
+    AppointmentRepository.cancelAppointment(
+      appointmentId,
+      userId,
+      (cancelAppointmentError, result) => {
+        if (cancelAppointmentError || result.n === 0) {
+          return callback(
+            null,
+            getError(cancelAppointmentError, 'Cancel appointment failed')
+          );
+        }
+        AppointmentRepository.getById(
+          appointmentId,
+          (getAppointmentError, appointment) => {
+            if (getAppointmentError) {
+              return callback(
+                null,
+                getError(getAppointmentError, 'Get appointment failed')
+              );
+            }
+            const { machineId, schedule } = appointment;
+            MachineRepository.removeSchedule(
+              machineId,
+              schedule,
+              (removeScheduleError, result) => {
+                if (removeScheduleError || result.n === 0) {
+                  return callback(
+                    null,
+                    getError(removeScheduleError, 'Remove schedule failed')
+                  );
+                }
+                callback(null, null);
+              }
+            );
+          }
+        );
+      }
+    );
+  });
+};

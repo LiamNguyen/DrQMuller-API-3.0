@@ -318,6 +318,33 @@ types:
           application/json:
             example: |
              {}
+  patch:
+    description: Cancel appointment
+    body:
+      application/json:
+        example: |
+          {
+            "appointmentId": "158033AE-1B43-4FF0-B2AE-F9D58170127B"
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+             {}
+      400:
+        body:
+          application/json:
+            example: |
+             {
+               "error_message": "There was a server error",
+               "error_code": "server_error"
+             }
+      401:
+        body:
+          application/json:
+            example: |
+             {}
 
 /resetPasswordConfirm:
   securedBy: x-token

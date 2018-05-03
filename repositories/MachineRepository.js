@@ -29,6 +29,19 @@ module.exports.addSchedule = (id, schedule, callback) => {
   });
 };
 
+module.exports.removeSchedule = (id, schedule, callback) => {
+  Machine.findOne({ id }, (error, machine) => {
+    if (error) {
+      return callback(error);
+    }
+    const { schedules } = machine;
+    const newSchedules = schedules.filter(
+      s => s.date !== schedule.date || s.time !== schedule.time
+    );
+    Machine.update({ id }, { $set: { schedules: newSchedules } }, callback);
+  });
+};
+
 module.exports.getAllMachines = callback => {
   Machine.find({}, { id: 1, name: 1, _id: 0 }, callback).sort({ name: 1 });
 };

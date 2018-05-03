@@ -249,6 +249,51 @@ describe('[Controller] Booking', () => {
     // TODO: User should not be able to create new appointment if schedule is missing or invalid
   });
 
+  describe('PATCH /appointment', () => {
+    it('User should be able to cancel the appointment', done => {
+      TestHelper.createAppointmentForUser(loginToken => {
+        chai
+          .request(server)
+          .get('/appointments')
+          .set('authorization', loginToken)
+          .send()
+          .end((getAppointmentsError, response) => {
+            response.should.have.status(200);
+            const { id: appointmentId } = response.body[0];
+            chai
+              .request(server)
+              .patch('/appointment')
+              .set('authorization', loginToken)
+              .send({ appointmentId })
+              .end((cancelAppointmentError, response) => {
+                response.should.have.status(200);
+                chai
+                  .request(server)
+                  .get('/appointments')
+                  .set('authorization', loginToken)
+                  .send()
+                  .end((getAppointmentsError, response) => {
+                    response.body.should.be.a('array');
+                    const appointments = response.body;
+                    const cancelledAppointment = appointments.find(
+                      appointment => appointment.id === appointmentId
+                    );
+                    cancelledAppointment.isCancelled.should.be.eql(true);
+                    done();
+                  });
+              });
+          });
+      });
+    });
+
+    // eslint-disable-next-line max-len
+    // TODO: User should not be able to cancel appointment if they are unauthorized
+    // eslint-disable-next-line max-len
+    // TODO: User should not be able to cancel appointment if appointment ID is missing or invalid
+    // eslint-disable-next-line max-len
+    // TODO: User should not be able to cancel appointment which has not been created by them
+  });
+
   describe('GET /appointments', () => {
     it('User should be able to get own appointments', done => {
       TestHelper.createAppointmentForUser((loginToken, machineId, schedule) => {
