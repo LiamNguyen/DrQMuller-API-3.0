@@ -54,6 +54,39 @@ function getAvailableList(machineId, date, startTime, endTime, callback) {
   });
 }
 
+function processAppointmentsToReturn(appointments, machines) {
+  // Include machine name in each appointment model
+  const appointmentsWithMachineNames = appointments.map(appointment => {
+    const { machineId } = appointment;
+    const { name: machineName } = machines.find(
+      machine => machine.id === machineId
+    );
+
+    // eslint-disable-next-line no-underscore-dangle
+    return { ...appointment._doc, machineName };
+  });
+
+  // Sort appointments
+  const validAppointments = [];
+  const cancelledAppointments = [];
+  const expiredAppointments = [];
+  appointmentsWithMachineNames.forEach(appointment => {
+    if (BookingHelper.isAppointmentValid(appointment)) {
+      validAppointments.push(appointment);
+    } else if (appointment.isCancelled) {
+      cancelledAppointments.push(appointment);
+    } else {
+      expiredAppointments.push(appointment);
+    }
+  });
+
+  return _.concat(
+    validAppointments,
+    cancelledAppointments,
+    expiredAppointments
+  );
+}
+
 exports.getAvailableTimes = (token, machineId, date, callback) => {
   // Validate input
   if (!UUIDValidator.validate(token)) {
@@ -188,15 +221,10 @@ exports.getAppointmentsByLoginToken = (token, callback) => {
               getError(getMachinesError, 'Get all machines failed')
             );
           }
-          const processedAppointments = appointments.map(appointment => {
-            const { machineId } = appointment;
-            const { name: machineName } = machines.find(
-              machine => machine.id === machineId
-            );
-
-            // eslint-disable-next-line no-underscore-dangle
-            return { ...appointment._doc, machineName };
-          });
+          const processedAppointments = processAppointmentsToReturn(
+            appointments,
+            machines
+          );
           callback(null, null, processedAppointments);
         });
       }
