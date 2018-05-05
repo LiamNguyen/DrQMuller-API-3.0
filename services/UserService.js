@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 const UUIDValidator = require('../lib/validators/UUIDValidator');
 const UserInfoValidator = require('../lib/validators/UserInfoValidator');
 const ErrorHelper = require('../lib/ErrorHelper');
@@ -5,10 +7,31 @@ const UserRepository = require('../repositories/UserRepository');
 
 const { getError } = ErrorHelper;
 
-exports.updateUserInfo = (token, info, callback) => {
+exports.getUserInfo = (token, callback) => {
   if (!UUIDValidator.validate(token)) {
     return callback(getError(null, 'Token validation failed'));
   }
+  UserRepository.getUserByLoginToken(token, (error, user) => {
+    if (error) {
+      return callback(getError(error, 'Get user by login token failed'));
+    }
+    callback(null, _.pick(user, ['username', 'role']));
+  });
+};
+
+exports.updateUserInfo = (token, requestInfo, callback) => {
+  if (!UUIDValidator.validate(token)) {
+    return callback(getError(null, 'Token validation failed'));
+  }
+  // Avoid unwanted value being inserted into database
+  const info = _.pick(requestInfo, [
+    'name',
+    'address',
+    'dob',
+    'gender',
+    'email',
+    'phone'
+  ]);
   if (!UserInfoValidator.validate(info)) {
     return callback(getError(null, 'User info validation failed'));
   }

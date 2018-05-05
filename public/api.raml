@@ -379,6 +379,26 @@ types:
 
 /user/me:
   securedBy: x-token
+  get:
+    description: Get own information
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "username": "SantaClause123",
+                "role": "user"
+              }
+      400:
+        body:
+          application/json:
+            example: |
+             {
+               "error_message": "There was a server error",
+               "error_code": "server_error"
+             }
+
   patch:
     description: Update user information
     body:

@@ -19,6 +19,31 @@ describe('[Controller] User', () => {
     mongoose.connection.db.dropDatabase(() => done());
   });
 
+  describe('GET /user/me', () => {
+    it('User should be able to get own info', done => {
+      const username = 'myusername1';
+
+      TestHelper.signin(
+        username,
+        'password1',
+        (clientError, error, loginToken) => {
+          chai
+            .request(server)
+            .get('/user/me')
+            .set('authorization', loginToken)
+            .send()
+            .end((getInfoError, response) => {
+              response.should.have.status(200);
+              response.body.should.be.a('object');
+              response.body.should.have.property('username').eql(username);
+              response.body.should.have.property('role').eql('user');
+              done();
+            });
+        }
+      );
+    });
+  });
+
   describe('PUT /user/me', () => {
     const username = 'username1';
     const password = 'password1';

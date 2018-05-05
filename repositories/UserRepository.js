@@ -24,6 +24,15 @@ module.exports.getUserByEmail = (email, callback) => {
   User.find({ email }, callback);
 };
 
+module.exports.getUserByLoginToken = (token, callback) => {
+  LoginTokenRepository.getUserIdByToken(token, (error, userId) => {
+    if (error) {
+      return callback(error);
+    }
+    User.findOne({ id: userId }, callback);
+  });
+};
+
 module.exports.updateUserInfo = (token, info, callback) => {
   LoginTokenRepository.getUserIdByToken(token, (error, userId) => {
     if (error) {

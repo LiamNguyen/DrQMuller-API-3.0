@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const UserRoleConstants = require('../../constants/UserRoleConstants');
+
 const userSchema = mongoose.Schema({
   id: {
     type: String,
@@ -33,6 +35,10 @@ const userSchema = mongoose.Schema({
   },
   status: {
     type: String
+  },
+  role: {
+    type: String,
+    default: UserRoleConstants.user
   },
   isFilledForConfirmation: {
     type: Boolean,
