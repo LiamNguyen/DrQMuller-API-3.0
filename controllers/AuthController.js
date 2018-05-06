@@ -44,7 +44,7 @@ exports.POST_SIGNOUT = (request, response, next) => {
       response.locals.statusCode = BAD_REQUEST;
       response.locals.error = error;
       next();
-    } else if (removal.result.n === 0) {
+    } else if (removal.n === 0) {
       response.locals.statusCode = UNAUTHORIZED;
       response.locals.clientError = {};
       next();
