@@ -36,3 +36,11 @@ module.exports.getNewlyCreatedAppointments = callback => {
     createdAt: 1
   });
 };
+
+module.exports.confirmAppointment = (id, confirmedBy, callback) => {
+  Appointment.update(
+    { id },
+    { $set: { isConfirmed: true, confirmedBy } },
+    callback
+  );
+};

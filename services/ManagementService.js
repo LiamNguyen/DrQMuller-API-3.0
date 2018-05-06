@@ -36,7 +36,7 @@ exports.getNewlyCreatedAppointments = (loginToken, callback) => {
   }
   UserRepository.getUserByLoginToken(loginToken, (error, user) => {
     if (error) {
-      return callback(null, getError(error, 'Get userId by token failed'));
+      return callback(null, getError(error, 'Get user by token failed'));
     }
     if (!user || ![UserRoleConstants.customerService].includes(user.role)) {
       return callback(ApiError.unauthorized);
@@ -56,6 +56,36 @@ exports.getNewlyCreatedAppointments = (loginToken, callback) => {
           );
           callback(null, null, processedAppointments);
         });
+      }
+    );
+  });
+};
+
+exports.confirmAppointment = (loginToken, appointmentId, callback) => {
+  if (!UUIDValidator.validate(loginToken)) {
+    return callback(null, getError(null, 'Token validation failed'));
+  }
+  if (!UUIDValidator.validate(appointmentId)) {
+    return callback(null, getError(null, 'Token validation failed'));
+  }
+  UserRepository.getUserByLoginToken(loginToken, (error, user) => {
+    if (error) {
+      return callback(null, getError(error, 'Get user by token failed'));
+    }
+    if (!user || ![UserRoleConstants.customerService].includes(user.role)) {
+      return callback(ApiError.unauthorized);
+    }
+    AppointmentRepository.confirmAppointment(
+      appointmentId,
+      user.id,
+      (confirmError, result) => {
+        if (confirmError || result.n === 0) {
+          return callback(
+            null,
+            getError(confirmError, 'Confirm appointment failed')
+          );
+        }
+        callback(null, null);
       }
     );
   });
