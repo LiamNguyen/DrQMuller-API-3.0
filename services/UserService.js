@@ -4,18 +4,22 @@ const UUIDValidator = require('../lib/validators/UUIDValidator');
 const UserInfoValidator = require('../lib/validators/UserInfoValidator');
 const ErrorHelper = require('../lib/ErrorHelper');
 const UserRepository = require('../repositories/UserRepository');
+const ApiError = require('../constants/ApiError');
 
 const { getError } = ErrorHelper;
 
 exports.getUserInfo = (token, callback) => {
   if (!UUIDValidator.validate(token)) {
-    return callback(getError(null, 'Token validation failed'));
+    return callback(null, getError(null, 'Token validation failed'));
   }
   UserRepository.getUserByLoginToken(token, (error, user) => {
     if (error) {
-      return callback(getError(error, 'Get user by login token failed'));
+      return callback(null, getError(error, 'Get user by login token failed'));
     }
-    callback(null, _.pick(user, ['username', 'role']));
+    if (!user) {
+      return callback(ApiError.unauthorized);
+    }
+    callback(null, null, _.pick(user, ['username', 'role']));
   });
 };
 

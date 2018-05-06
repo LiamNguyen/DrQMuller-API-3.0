@@ -6,6 +6,7 @@ const Auth = require('./Auth');
 const Docs = require('./Docs');
 const User = require('./User');
 const Booking = require('./Booking');
+const Management = require('./Management');
 const ApiError = require('../constants/ApiError');
 
 module.exports = app => {
@@ -13,6 +14,7 @@ module.exports = app => {
   app.use(Docs);
   app.use(User);
   app.use(Booking);
+  app.use(Management);
 
   // Error handler
   app.use((request, response) => {

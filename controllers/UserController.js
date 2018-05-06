@@ -5,9 +5,9 @@ const UserService = require('../services/UserService');
 exports.GET_INFO = (request, response, next) => {
   const { authorization } = request.headers;
 
-  UserService.getUserInfo(authorization, (error, userInfo) => {
-    if (error) {
-      response.locals.statusCode = BAD_REQUEST;
+  UserService.getUserInfo(authorization, (clientError, error, userInfo) => {
+    if (clientError || error) {
+      response.locals.statusCode = clientError ? UNAUTHORIZED : BAD_REQUEST;
       response.locals.error = error;
       next();
     } else {

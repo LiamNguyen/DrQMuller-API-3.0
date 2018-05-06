@@ -30,3 +30,9 @@ module.exports.cancelAppointment = (id, userId, callback) => {
 module.exports.getById = (id, callback) => {
   Appointment.findOne({ id }, callback);
 };
+
+module.exports.getNewlyCreatedAppointments = callback => {
+  Appointment.find({ isConfirmed: false, isCancelled: false }, callback).sort({
+    createdAt: 1
+  });
+};
