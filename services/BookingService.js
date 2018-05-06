@@ -161,7 +161,7 @@ exports.createAppointment = (token, machineId, schedule, callback) => {
         userId,
         machineId,
         schedule,
-        createAppointmentError => {
+        (createAppointmentError, appointmentId) => {
           if (createAppointmentError) {
             return callback(
               null,
@@ -181,7 +181,7 @@ exports.createAppointment = (token, machineId, schedule, callback) => {
               // TODO: Release booking in temporary collection
               // TODO: Send email to customer service
               // TODO: Push notification via Socket.io to management portal
-              callback(null, null);
+              callback(null, null, appointmentId);
             }
           );
         }

@@ -114,6 +114,10 @@ describe('[Controller] Booking', () => {
                 })
                 .end((createAppointmentError, response) => {
                   response.should.have.status(201);
+                  response.body.should.be.a('object');
+                  response.body.should.have
+                    .property('appointmentId')
+                    .not.equal(null || '');
                   LoginTokenRepository.getUserIdByToken(
                     loginToken,
                     (getUserIdByTokenError, userId) => {

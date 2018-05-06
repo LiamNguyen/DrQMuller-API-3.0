@@ -36,7 +36,7 @@ exports.CREATE_APPOINTMENT = (request, response, next) => {
     authorization,
     machineId,
     schedule,
-    (clientError, error) => {
+    (clientError, error, appointmentId) => {
       if (clientError || error) {
         response.locals.statusCode =
           clientError &&
@@ -47,7 +47,7 @@ exports.CREATE_APPOINTMENT = (request, response, next) => {
         response.locals.error = error;
         next();
       } else {
-        response.status(CREATED).send({});
+        response.status(CREATED).send({ appointmentId });
       }
     }
   );

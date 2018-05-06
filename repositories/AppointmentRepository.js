@@ -12,7 +12,7 @@ module.exports.create = (userId, machineId, schedule, callback) => {
       machineId,
       schedule
     },
-    callback
+    error => callback(error, id)
   );
 };
 
