@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const moment = require('moment');
 
 const MachineRepository = require('../repositories/MachineRepository');
 const BookingConstants = require('../constants/BookingConstants');
@@ -44,7 +45,10 @@ function getAvailableList(machineId, date, startTime, endTime, callback) {
         .filter(schedule => schedule.date === date)
         .map(schedule => schedule.time);
 
-      if (!_.includes(bookedTime, time)) {
+      if (
+        !_.includes(bookedTime, time) &&
+        moment(`${date} ${time}`).isAfter(moment())
+      ) {
         result.push(time);
       }
       time = addMinutes(time, period);
