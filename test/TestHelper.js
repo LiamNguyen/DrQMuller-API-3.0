@@ -39,7 +39,7 @@ function createMachineWithSchedule(name, schedules, callback) {
   });
 }
 
-function mockAvailableTime(omitList) {
+function mockAvailableTime(date, omitList) {
   let morningTime = morningShiftStartTime;
   let afternoonTime = afternoonShiftStartTime;
   const morningAvailableTime = [];
@@ -52,7 +52,10 @@ function mockAvailableTime(omitList) {
       morningAvailableTime[morningAvailableTime.length - 1]
     )
   ) {
-    if (!_.includes(omitList, morningTime)) {
+    if (
+      !_.includes(omitList, morningTime) &&
+      moment(`${date} ${morningTime}`).isAfter(moment())
+    ) {
       morningAvailableTime.push(morningTime);
     }
     morningTime = addMinutes(morningTime, period);
@@ -65,7 +68,10 @@ function mockAvailableTime(omitList) {
       afternoonAvailableTime[afternoonAvailableTime.length - 1]
     )
   ) {
-    if (!_.includes(omitList, afternoonTime)) {
+    if (
+      !_.includes(omitList, afternoonTime) &&
+      moment(`${date} ${afternoonTime}`).isAfter(moment())
+    ) {
       afternoonAvailableTime.push(afternoonTime);
     }
     afternoonTime = addMinutes(afternoonTime, period);

@@ -41,7 +41,10 @@ describe('[Controller] Booking', () => {
               .end((getTimeError, response) => {
                 response.should.have.status(200);
                 should.equal(
-                  _.isEqual(response.body, TestHelper.mockAvailableTime([])),
+                  _.isEqual(
+                    response.body,
+                    TestHelper.mockAvailableTime(today, [])
+                  ),
                   true
                 );
                 done();
@@ -70,7 +73,7 @@ describe('[Controller] Booking', () => {
                   should.equal(
                     _.isEqual(
                       response.body,
-                      TestHelper.mockAvailableTime(['17:50', '22:00'])
+                      TestHelper.mockAvailableTime(today, ['17:50', '22:00'])
                     ),
                     true
                   );
